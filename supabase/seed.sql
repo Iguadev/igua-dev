@@ -1,0 +1,3 @@
+-- Runs only via local reset/seed. Deliberately no fictional people, events, projects or sponsors.
+-- See docs/DEVELOPMENT.md for disposable fixtures created by automated tests.
+-- The migration supplies only the real editorial program proposals and interests.
