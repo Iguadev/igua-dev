@@ -7,6 +7,8 @@
   --font-mono: var(--font-geist-mono);
 }
 :root {
+  --earth: #d9603b;
+  --earth-ink: #230e07;
   --background: #0b1016;
   --foreground: #f4f7f8;
   --primary: #b5f36b;
@@ -493,86 +495,81 @@ a:hover {
   font-family: var(--font-geist-mono);
 }
 .origin-section {
-  background: #10181c;
-  border-top: 1px solid #ffffff09;
-  border-bottom: 1px solid #ffffff09;
-  padding: 85px 0;
+  padding: 120px 0;
+  background: var(--earth);
+  color: var(--earth-ink);
+}
+.origin-section ::selection {
+  background: var(--earth-ink);
+  color: var(--earth);
+}
+.origin-section :focus-visible {
+  outline-color: var(--earth-ink);
 }
 .origin-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
+  gap: 72px;
 }
 .origin-copy h2 {
-  font-size: 39px;
-  line-height: 1.17;
-  letter-spacing: -1.5px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  font-size: clamp(2.25rem, 4.6vw, 4rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.origin-copy h2 .marker-word {
+  color: #fff1dc;
 }
 .origin-copy p {
-  font-size: 14px;
+  max-width: 34rem;
   margin-bottom: 18px;
+  font-size: 17px;
+  color: var(--earth-ink);
 }
 .origin-copy .text-link {
-  margin-top: 8px;
+  margin-top: 14px;
+  border-color: rgb(35 14 7 / 0.45);
 }
-.origin-visual {
-  height: 350px;
+.origin-copy .text-link:hover {
+  border-color: currentColor;
+  color: #000;
+}
+.frontier-map {
   position: relative;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background-image: radial-gradient(#7b8d7a44 0.7px, transparent 0.7px);
-  background-size: 20px 20px;
+  width: 100%;
+  margin: 0;
+  container-type: inline-size;
 }
-.origin-orbit {
+.frontier-landscape {
+  display: block;
+  width: 100%;
+  height: auto;
+  mask-image: radial-gradient(ellipse 50% 50%, #000 48%, rgb(0 0 0 / 0.88) 65%, transparent 100%);
+}
+.frontier-city {
   position: absolute;
-  border: 1px solid #b5f36b25;
-  border-radius: 50%;
-  transform: rotate(-35deg);
-  width: 230px;
-  height: 115px;
+  padding: 2px 5px;
+  background: var(--earth);
+  color: var(--earth-ink);
+  font-size: clamp(11px, 2.4cqi, 14px);
+  font-weight: 550;
+  line-height: 1.25;
 }
-.orbit-two {
-  width: 370px;
-  height: 195px;
+.frontier-city-oeste {
+  top: 22%;
+  left: 5%;
 }
-.orbit-three {
-  width: 510px;
-  height: 275px;
+.frontier-city-foz {
+  top: 42%;
+  right: 9%;
 }
-.origin-center {
-  font-size: 70px;
-  letter-spacing: -4px;
-  position: relative;
-  z-index: 1;
-  line-height: 1;
-  color: var(--primary);
-}
-.origin-center span {
-  position: absolute;
-  bottom: -15px;
-  left: 50%;
-  height: 5px;
-  width: 5px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-.origin-city,
-.origin-world {
-  position: absolute;
-  font-size: 10px;
-  font-family: var(--font-geist-mono);
-  color: #91a38d;
-}
-.origin-city {
-  bottom: 62px;
-  left: 55px;
-}
-.origin-world {
-  top: 53px;
-  right: 10px;
+.frontier-city-iguazu {
+  top: 85%;
+  left: 56%;
+  transform: translate(-50%, -50%);
 }
 .program-grid {
   display: grid;
@@ -1553,8 +1550,9 @@ a:hover {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  .origin-visual {
-    height: 260px;
+  .frontier-map {
+    max-width: 560px;
+    justify-self: center;
   }
   .origin-copy h2 {
     font-size: 34px;

@@ -5,6 +5,7 @@ import Link from '@/components/localized-link';
 import { ArrowDown, ArrowUpRight, BookOpen, Code2, MessagesSquare, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Confluence } from '@/components/confluence';
+import { FrontierMap } from '@/components/frontier-map';
 import {
   ClosingCTA,
   EmptyState,
@@ -157,17 +158,6 @@ export default async function Home() {
       </section>
       <section className="origin-section">
         <div className="container origin-grid">
-          <div className="origin-visual" aria-hidden="true">
-            <div className="origin-orbit orbit-one" />
-            <div className="origin-orbit orbit-two" />
-            <div className="origin-orbit orbit-three" />
-            <div className="origin-center">
-              {t('acá')}
-              <span />{' '}
-            </div>
-            <span className="origin-city">Puerto Iguazú, AR</span>
-            <span className="origin-world">{t('↗ conectados con el mundo')}</span>
-          </div>
           <div className="origin-copy">
             <span className="small-label">Built in Iguazú</span>
             <h2>{originContent?.title || t('No hace falta irse lejos para llegar lejos.')}</h2>
@@ -187,6 +177,7 @@ export default async function Home() {
               <ArrowUpRight size={17} />
             </Link>
           </div>
+          <FrontierMap language={language} />
         </div>
       </section>
       <section className="section">
