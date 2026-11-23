@@ -447,10 +447,6 @@
   "código de convivencia": "code of conduct",
   "y la": "and",
   "política de privacidad": "privacy policy",
-  "Reanudar animación de conexiones": "Resume connection animation",
-  "Pausar animación de conexiones": "Pause connection animation",
-  "Reanudar": "Resume",
-  "Pausar": "Pause",
   "Ilustración abstracta de rutas que se conectan, inspirada en la confluencia de los ríos de Iguazú": "An abstract network inspired by the rivers meeting at Iguazú",
   "CONEXIONES SIN FRONTERAS": "CONNECTIONS WITHOUT BORDERS",
   "Misiones, Argentina": "Misiones, Argentina",
@@ -652,5 +648,6 @@
   "Reglamento de Salta.dev": "Salta.dev community guidelines",
   "Redacción propia para la realidad y los canales actuales de IGUA.DEV.": "Written for IGUA.DEV’s circumstances and currently available channels.",
   "Leer el reglamento completo": "Read the full community guidelines",
-  "Reglamento": "Community guidelines"
+  "Reglamento": "Community guidelines",
+  "Cambiar idioma": "Change language"
 }

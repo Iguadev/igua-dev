@@ -1,10 +1,13 @@
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, pick } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
-import { ArrowDown, ArrowUpRight, BookOpen, Code2, MessagesSquare, Network } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BookOpen, Code2, MessagesSquare, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Confluence } from '@/components/confluence';
+import { HeroVideo } from '@/components/hero-video';
+import { HeroMark } from '@/components/hero-mark';
+import { MarkerWord } from '@/components/marker-word';
+import { TopicRibbon } from '@/components/topic-ribbon';
 import { FrontierMap } from '@/components/frontier-map';
 import {
   ClosingCTA,
@@ -36,22 +39,51 @@ export default async function Home() {
   const upcoming = allEvents
     .filter((e) => e.status === 'published' && new Date(e.ends_at) > new Date())
     .slice(0, 3);
+  const pillars = [
+    {
+      icon: BookOpen,
+      title: t('Aprender'),
+      text: t('De tu primer “hola mundo” a tu próximo desafío. Siempre hay algo por descubrir.'),
+    },
+    {
+      icon: Code2,
+      title: t('Construir'),
+      text: t('Menos ideas en un cajón. Más proyectos en el mundo. Probamos, creamos e iteramos.'),
+    },
+    {
+      icon: Network,
+      title: t('Conectar'),
+      text: t('Encontrá a quienes comparten tus ganas de hacer. Las conexiones abren caminos.'),
+    },
+    {
+      icon: MessagesSquare,
+      title: t('Compartir'),
+      text: t(
+        'Lo que sabés puede ser el comienzo de alguien más. El conocimiento crece cuando circula.',
+      ),
+    },
+  ];
   return (
     <>
       <section className="hero">
+        <HeroVideo />
         <div className="container hero-grid">
           <div className="hero-copy">
-            <div className="location-tag">
-              <span className="status-dot" />
-              Puerto Iguazú, Misiones <span className="location-dash" /> Argentina
-            </div>
             <h1>
-              {t('El futuro también')}
-              <br className="desktop-break" />
-              {' ' + t('se construye')}
-              <br className="desktop-break" />
-              {' ' + t('desde acá')}
-              <span className="headline-dot">.</span>
+              <span className="hero-line">
+                <HeroMark
+                  text={t('El futuro también')}
+                  word={pick(language, { es: 'futuro', pt: 'futuro', en: 'future' })}
+                />
+              </span>{' '}
+              <span className="hero-line">
+                <HeroMark
+                  text={t('se construye')}
+                  word={pick(language, { es: 'construye', pt: 'constrói', en: 'built' })}
+                  underline
+                />
+              </span>{' '}
+              <span className="hero-line">{`${t('desde acá')}.`}</span>
             </h1>
             <p>
               {t(
@@ -61,93 +93,53 @@ export default async function Home() {
             <div className="hero-buttons">
               <Button asChild>
                 <Link href={languagePath(language, '/join')}>
-                  {t('Unirme a IGUA.DEV') + ' '}
+                  {t('Unirme a IGUA.DEV')}
                   <ArrowUpRight size={18} />
                 </Link>
               </Button>
-              <Button variant="ghost" asChild>
+              <Button variant="secondary" asChild>
                 <Link href={languagePath(language, '/events')}>
-                  {t('Explorar eventos') + ' '}
-                  <ArrowUpRight size={17} />
+                  {t('Explorar eventos')}
+                  <ArrowRight size={18} />
                 </Link>
               </Button>
             </div>
-            <div className="hero-note">
-              <span>{t('La comunidad es abierta. Las posibilidades, también.')}</span>
-            </div>
           </div>
-          <Confluence />
-        </div>
-        <div className="container hero-bottom">
-          <span>{t('Un lugar para quienes hacen.')}</span>
-          <a href="#hacemos" aria-label={t('Descubrí qué hacemos')}>
-            <ArrowDown size={16} />
-            <span>{t('Seguí explorando')}</span>
-          </a>
-          <span className="mono">Built in Iguazú ↗</span>
         </div>
       </section>
-      <section className="section activities" id="hacemos">
+      <TopicRibbon language={language} />
+      <section className="section pillars" id="hacemos">
         <div className="container">
-          <div className="section-heading">
-            <h2>
+          <div className="pillars-head">
+            <h2 className="display-title">
               {t('Las mejores ideas')}
               <br />
-              {t('se construyen en comunidad.')}
+              <MarkerWord
+                text={t('se construyen en comunidad.')}
+                word={pick(language, { es: 'comunidad', pt: 'comunidade', en: 'together' })}
+              />
             </h2>
             <p>
-              {t('Nos une la curiosidad.')}
-              <br />
-              {t('Nos mueve hacer cosas con ella.')}
+              {t('Nos une la curiosidad.')} {t('Nos mueve hacer cosas con ella.')}
             </p>
           </div>
-          <div className="activity-grid">
-            {[
-              {
-                icon: BookOpen,
-                title: t('Aprender'),
-                text: t(
-                  'De tu primer “hola mundo” a tu próximo desafío. Siempre hay algo por descubrir.',
-                ),
-              },
-              {
-                icon: Code2,
-                title: t('Construir'),
-                text: t(
-                  'Menos ideas en un cajón. Más proyectos en el mundo. Probamos, creamos e iteramos.',
-                ),
-              },
-              {
-                icon: Network,
-                title: t('Conectar'),
-                text: t(
-                  'Encontrá a quienes comparten tus ganas de hacer. Las conexiones abren caminos.',
-                ),
-              },
-              {
-                icon: MessagesSquare,
-                title: t('Compartir'),
-                text: t(
-                  'Lo que sabés puede ser el comienzo de alguien más. El conocimiento crece cuando circula.',
-                ),
-              },
-            ].map(({ icon: Icon, title, text }) => (
-              <article key={title}>
-                <Icon size={24} strokeWidth={1.5} />
+          <ul className="pillar-list">
+            {pillars.map(({ icon: Icon, title, text }) => (
+              <li key={title}>
+                <span className="pillar-icon">
+                  <Icon size={22} strokeWidth={1.8} aria-hidden="true" />
+                </span>
                 <h3>{title}</h3>
                 <p>{text}</p>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
       <section className="section">
         <div className="container">
           <div className="section-heading">
-            <div>
-              <span className="small-label">{t('Nos vemos pronto')}</span>
-              <h2>{t('Del chat al encuentro.')}</h2>
-            </div>
+            <h2>{t('Del chat al encuentro.')}</h2>
             <Link className="text-link" href={languagePath(language, '/events')}>
               {t('Todos los eventos') + ' '}
               <ArrowUpRight size={17} />
@@ -156,11 +148,15 @@ export default async function Home() {
           {upcoming.length ? <EventCards events={upcoming} /> : <EmptyState />}
         </div>
       </section>
-      <section className="origin-section">
+      <section className="origin-section" data-nav-tone="earth">
         <div className="container origin-grid">
           <div className="origin-copy">
-            <span className="small-label">Built in Iguazú</span>
-            <h2>{originContent?.title || t('No hace falta irse lejos para llegar lejos.')}</h2>
+            <h2>
+              <MarkerWord
+                text={originContent?.title || t('No hace falta irse lejos para llegar lejos.')}
+                word={pick(language, { es: 'llegar lejos', pt: 'ir longe', en: 'go far' })}
+              />
+            </h2>
             <p>
               {originContent?.body ||
                 t(
@@ -183,10 +179,7 @@ export default async function Home() {
       <section className="section">
         <div className="container">
           <div className="section-heading">
-            <div>
-              <span className="small-label">{t('Muchas formas de crear')}</span>
-              <h2>{t('Tu curiosidad tiene lugar.')}</h2>
-            </div>
+            <h2>{t('Tu curiosidad tiene lugar.')}</h2>
             <Link href={languagePath(language, '/programs')} className="text-link">
               {t('Explorar programas') + ' '}
               <ArrowUpRight size={17} />
@@ -198,10 +191,7 @@ export default async function Home() {
       <section className="section projects-section">
         <div className="container">
           <div className="section-heading">
-            <div>
-              <span className="small-label">{t('Ideas que salen al mundo')}</span>
-              <h2>{t('Hecho por la comunidad.')}</h2>
-            </div>
+            <h2>{t('Hecho por la comunidad.')}</h2>
             <Link href={languagePath(language, '/projects')} className="text-link">
               {t('Ver proyectos') + ' '}
               <ArrowUpRight size={17} />
@@ -214,12 +204,9 @@ export default async function Home() {
           )}
         </div>
       </section>
-      <section className="section partners-strip">
+      <section className="partners-strip">
         <div className="container">
-          <div>
-            <span className="small-label">{t('El ecosistema lo hacemos juntos')}</span>
-            <h2>{t('Construyamos más oportunidades.')}</h2>
-          </div>
+          <h2>{t('Construyamos más oportunidades.')}</h2>
           {allPartners.length ? (
             <div className="partner-names">
               {allPartners.map((p) => (
@@ -229,10 +216,12 @@ export default async function Home() {
           ) : (
             <p>{t('Estamos abiertos a nuevas alianzas que hagan crecer el talento local.')}</p>
           )}
-          <Link href={languagePath(language, '/partners')} className="text-link">
-            {t('Ser parte como aliado') + ' '}
-            <ArrowUpRight size={17} />
-          </Link>
+          <Button variant="outline" asChild>
+            <Link href={languagePath(language, '/partners')}>
+              {t('Ser parte como aliado')}
+              <ArrowUpRight size={17} />
+            </Link>
+          </Button>
         </div>
       </section>
       <ClosingCTA />
