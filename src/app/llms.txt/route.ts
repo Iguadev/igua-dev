@@ -28,6 +28,16 @@ IGUA.DEV connects developers, students, designers, founders, and people curious 
 
 - [Reglamento](${absolute('/reglamento')}): Convivencia, privacidad, reportes y moderación.
 
+## Português
+- [Início](${absolute('/pt')}): Missão e atividades da comunidade.
+- [Sobre](${absolute('/pt/about')}): História, valores e perguntas frequentes.
+- [Eventos](${absolute('/pt/events')}): Encontros e oficinas publicados.
+- [Recursos](${absolute('/pt/recursos')}): Tutoriais e documentação selecionados.
+- [Comunidade](${absolute('/pt/community')}): Participação e código de convivência.
+- [Parcerias](${absolute('/pt/partners')}): Colaborações confirmadas.
+
+- [Regulamento](${absolute('/pt/reglamento')}): Convivência, privacidade, denúncias e moderação.
+
 ## Content notes
 Community-submitted projects and event descriptions may remain in their original language. Links in the resources library are references, not partnership claims. Public member profiles are opt-in; email addresses are private. Use the linked public pages for current organization and activity details.
 

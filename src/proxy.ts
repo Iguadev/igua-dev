@@ -1,10 +1,9 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseConfig } from '@/lib/env';
-import { languagePath, stripLanguage } from '@/lib/i18n/routing';
+import { languagePath, pathLanguage, stripLanguage } from '@/lib/i18n/routing';
 export async function proxy(request: NextRequest) {
-  const language =
-    request.nextUrl.pathname === '/en' || request.nextUrl.pathname.startsWith('/en/') ? 'en' : 'es';
+  const language = pathLanguage(request.nextUrl.pathname);
   const pathname = stripLanguage(request.nextUrl.pathname);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-igua-language', language);
@@ -18,7 +17,7 @@ export async function proxy(request: NextRequest) {
   const destination = request.nextUrl.clone();
   destination.pathname = pathname;
   const nextResponse = () =>
-    language === 'en'
+    language !== 'es'
       ? NextResponse.rewrite(destination, { request: { headers: requestHeaders } })
       : NextResponse.next({ request: { headers: requestHeaders } });
   const config = supabaseConfig();

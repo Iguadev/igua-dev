@@ -1,5 +1,5 @@
 import { getI18n } from '@/lib/i18n/server';
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, pick } from '@/lib/i18n/routing';
 import { ActionForm, Field } from './action-form';
 import { magicLink, oauth } from '@/features/auth/actions';
 export async function AuthPanel({
@@ -29,7 +29,7 @@ export async function AuthPanel({
           <ActionForm
             key={provider}
             action={oauth}
-            submit={`${language === 'en' ? 'Continue with' : 'Continuar con'} ${label}`}
+            submit={`${pick(language, { es: 'Continuar con', pt: 'Continuar com', en: 'Continue with' })} ${label}`}
             disabled={!enabled}
           >
             <input type="hidden" name="provider" value={provider} />
@@ -44,7 +44,11 @@ export async function AuthPanel({
           label="Email"
           name="email"
           type="email"
-          placeholder={language === 'en' ? 'you@example.com' : 'vos@ejemplo.com'}
+          placeholder={pick(language, {
+            es: 'vos@ejemplo.com',
+            pt: 'voce@exemplo.com',
+            en: 'you@example.com',
+          })}
           required
           maxLength={254}
         />

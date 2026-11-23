@@ -1,16 +1,31 @@
 import type { Metadata } from 'next';
 import english from './i18n/en.json';
-import { languagePath, translator, type Language } from './i18n/routing';
+import portuguese from './i18n/pt.json';
+import {
+  languagePath,
+  languages,
+  languageTags,
+  ogLocales,
+  pick,
+  translator,
+  type Language,
+} from './i18n/routing';
 import { siteUrl } from './env';
-export function languageAlternates(path: string) {
+const dictionaries: Record<Language, Record<string, string>> = {
+  es: {},
+  pt: portuguese,
+  en: english,
+};
+export function languageAlternates(path: string): Record<string, string> {
   return {
-    'es-AR': new URL(languagePath('es', path), siteUrl).href,
-    en: new URL(languagePath('en', path), siteUrl).href,
+    ...Object.fromEntries(
+      languages.map((l) => [languageTags[l], new URL(languagePath(l, path), siteUrl).href]),
+    ),
     'x-default': new URL(languagePath('es', path), siteUrl).href,
   };
 }
 export function localizeMetadata(metadata: Metadata, language: Language): Metadata {
-  const t = translator(language, english);
+  const t = translator(language, dictionaries[language]);
   const title = typeof metadata.title === 'string' ? t(metadata.title) : metadata.title;
   const description = metadata.description ? t(metadata.description) : undefined;
   const socialTitle =
@@ -36,8 +51,8 @@ export function localizeMetadata(metadata: Metadata, language: Language): Metada
     openGraph: {
       type: 'website',
       siteName: 'IGUA.DEV',
-      locale: language === 'en' ? 'en_US' : 'es_AR',
-      alternateLocale: language === 'en' ? 'es_AR' : 'en_US',
+      locale: ogLocales[language],
+      alternateLocale: languages.filter((l) => l !== language).map((l) => ogLocales[l]),
       title: socialTitle,
       ...(description ? { description } : {}),
       ...(path ? { url: languagePath(language, path) } : {}),
@@ -79,10 +94,11 @@ export function siteEntities(path: string, language: Language, title: string) {
     '@id': `${origin}#organization`,
     name: 'IGUA.DEV',
     url: origin,
-    description:
-      language === 'en'
-        ? 'Independent, technology-agnostic developer community based in Puerto Iguazú, Misiones, Argentina.'
-        : 'Comunidad independiente y abierta de tecnología con base en Puerto Iguazú, Misiones, Argentina.',
+    description: pick(language, {
+      es: 'Comunidad independiente y abierta de tecnología con base en Puerto Iguazú, Misiones, Argentina.',
+      pt: 'Comunidade independente e aberta de tecnologia com base em Puerto Iguazú, Misiones, Argentina.',
+      en: 'Independent, technology-agnostic developer community based in Puerto Iguazú, Misiones, Argentina.',
+    }),
     logo: { '@type': 'ImageObject', url: new URL('/brand/symbol.svg', siteUrl).href },
     location: {
       '@type': 'Place',
@@ -100,7 +116,7 @@ export function siteEntities(path: string, language: Language, title: string) {
     '@id': `${canonical}#webpage`,
     url: canonical,
     name: title,
-    inLanguage: language === 'en' ? 'en' : 'es-AR',
+    inLanguage: languageTags[language],
     isPartOf: { '@id': `${origin}#website` },
     about: { '@id': `${origin}#organization` },
   };
@@ -110,7 +126,7 @@ export function siteEntities(path: string, language: Language, title: string) {
       {
         '@type': 'ListItem',
         position: 1,
-        name: language === 'en' ? 'Home' : 'Inicio',
+        name: pick(language, { es: 'Inicio', pt: 'Início', en: 'Home' }),
         item: new URL(languagePath(language, '/'), siteUrl).href,
       },
       ...(path === '/' ? [] : [{ '@type': 'ListItem', position: 2, name: title, item: canonical }]),
@@ -125,7 +141,7 @@ export function siteEntities(path: string, language: Language, title: string) {
         '@id': `${origin}#website`,
         url: origin,
         name: 'IGUA.DEV',
-        inLanguage: ['es-AR', 'en'],
+        inLanguage: languages.map((l) => languageTags[l]),
         publisher: { '@id': `${origin}#organization` },
       },
       webpage,

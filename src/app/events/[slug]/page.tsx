@@ -1,5 +1,5 @@
 import { getI18n } from '@/lib/i18n/server';
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, languageTags, pick } from '@/lib/i18n/routing';
 import { localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
 import Image from 'next/image';
@@ -108,9 +108,13 @@ export default async function EventDetail({ params }: { params: Promise<{ slug: 
               />
             </div>
           )}
-          {language === 'en' && (
+          {language !== 'es' && (
             <p className="notice">
-              Event details are provided by the organizers in their original language.
+              {pick(language, {
+                es: '',
+                pt: 'Os detalhes do evento são informados pelos organizadores no idioma original.',
+                en: 'Event details are provided by the organizers in their original language.',
+              })}
             </p>
           )}
           <p>{event.description}</p>
@@ -145,7 +149,7 @@ export default async function EventDetail({ params }: { params: Promise<{ slug: 
           <dl>
             <dt>{t('Cuándo')}</dt>
             <dd>
-              {eventDate(event.starts_at, event.time_zone, language === 'en' ? 'en' : 'es-AR')}
+              {eventDate(event.starts_at, event.time_zone, languageTags[language])}
               <br />
               <span className="muted">{t('Horario de Iguazú (UTC−3)')}</span>
             </dd>
@@ -173,9 +177,11 @@ export default async function EventDetail({ params }: { params: Promise<{ slug: 
               {event.capacity}
               {' ' + t('lugares en total.')}
               {open && available !== null
-                ? language === 'en'
-                  ? ` ${available} available. When full, you can join the waitlist.`
-                  : ` ${available} disponibles. Si se completa, podés sumarte a la lista de espera.`
+                ? ` ${available} ${pick(language, {
+                    es: 'disponibles. Si se completa, podés sumarte a la lista de espera.',
+                    pt: 'disponíveis. Se lotar, você pode entrar na lista de espera.',
+                    en: 'available. When full, you can join the waitlist.',
+                  })}`
                 : ''}
             </dd>
           </dl>

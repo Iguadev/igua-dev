@@ -3,6 +3,7 @@ import Link from '@/components/localized-link';
 import { requireMember } from '@/features/auth/guards';
 import { PageIntro, EmptyState } from '@/components/sections';
 import { eventDate } from '@/lib/utils';
+import { languageTags } from '@/lib/i18n/routing';
 export default async function MyEvents() {
   const { t, language } = await getI18n();
   const member = await requireMember();
@@ -43,7 +44,7 @@ export default async function MyEvents() {
                     </td>
                     <td>
                       {e
-                        ? eventDate(e.starts_at, undefined, language === 'en' ? 'en' : 'es-AR')
+                        ? eventDate(e.starts_at, undefined, languageTags[language])
                         : '—'}
                     </td>
                     <td>

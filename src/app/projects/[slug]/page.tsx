@@ -1,4 +1,5 @@
 import { getI18n } from '@/lib/i18n/server';
+import { pick } from '@/lib/i18n/routing';
 import { localizeMetadata } from '@/lib/seo';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/supabase/server';
@@ -40,9 +41,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <PageIntro label={t('Hecho por la comunidad')} title={project.title} />
       <div className="two-column">
         <div className="prose">
-          {language === 'en' && (
+          {language !== 'es' && (
             <p className="notice">
-              Project details are shared by their creators in the original language.
+              {pick(language, {
+                es: '',
+                pt: 'Os detalhes do projeto são compartilhados pelos criadores no idioma original.',
+                en: 'Project details are shared by their creators in the original language.',
+              })}
             </p>
           )}
           <p>{project.description}</p>

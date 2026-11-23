@@ -1,4 +1,4 @@
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, languageTags } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
 import Link from '@/components/localized-link';
 import { requireStaff } from '@/features/auth/guards';
@@ -63,7 +63,7 @@ export default async function AdminEvents({
               {data.map((e) => (
                 <tr key={e.id}>
                   <td>{e.title}</td>
-                  <td>{eventDate(e.starts_at, undefined, language === 'en' ? 'en' : 'es-AR')}</td>
+                  <td>{eventDate(e.starts_at, undefined, languageTags[language])}</td>
                   <td>
                     {e.status} / {e.registration_status}
                   </td>

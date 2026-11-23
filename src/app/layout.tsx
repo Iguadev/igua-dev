@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Permanent_Marker } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -8,9 +9,15 @@ import { siteUrl } from '@/lib/env';
 import './globals.css';
 import { headers } from 'next/headers';
 import { getI18n } from '@/lib/i18n/server';
+import { languageTags } from '@/lib/i18n/routing';
 import { LanguageProvider } from '@/components/i18n/provider';
 import { localizeMetadata, pageLabels, siteEntities } from '@/lib/seo';
 import { JsonLd } from '@/components/json-ld';
+const marker = Permanent_Marker({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-marker',
+});
 export async function generateMetadata(): Promise<Metadata> {
   const { language, t } = await getI18n();
   const h = await headers();
@@ -41,9 +48,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const path = h.get('x-igua-path') || '/';
   return (
     <html
-      lang={language === 'en' ? 'en' : 'es-AR'}
+      lang={languageTags[language]}
       data-scroll-behavior="smooth"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${marker.variable}`}
     >
       <body>
         <LanguageProvider language={language}>

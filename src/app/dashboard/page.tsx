@@ -1,4 +1,4 @@
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, pick } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
 import Link from '@/components/localized-link';
 import { requireMember } from '@/features/auth/guards';
@@ -23,7 +23,7 @@ export default async function Dashboard() {
     <>
       <PageIntro
         label={t('Tu comunidad')}
-        title={`${language === 'en' ? 'Hello' : 'Hola'}${member.profile?.display_name ? `, ${member.profile.display_name}` : ''}.`}
+        title={`${pick(language, { es: 'Hola', pt: 'Olá', en: 'Hello' })}${member.profile?.display_name ? `, ${member.profile.display_name}` : ''}.`}
       >
         <p>{t('Este es tu espacio para encontrarte, aprender y construir.')}</p>
       </PageIntro>
