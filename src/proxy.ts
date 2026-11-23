@@ -14,12 +14,7 @@ export async function proxy(request: NextRequest) {
       ? 'true'
       : 'false',
   );
-  const destination = request.nextUrl.clone();
-  destination.pathname = pathname;
-  const nextResponse = () =>
-    language !== 'es'
-      ? NextResponse.rewrite(destination, { request: { headers: requestHeaders } })
-      : NextResponse.next({ request: { headers: requestHeaders } });
+  const nextResponse = () => NextResponse.next({ request: { headers: requestHeaders } });
   const config = supabaseConfig();
   const protectedPath = /^\/(dashboard|admin)(?:\/|$)/.test(pathname);
   if (!config)

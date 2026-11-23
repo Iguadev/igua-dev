@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs/config';
+import { prefixedLanguages } from './src/lib/i18n/routing';
 const config: NextConfig = {
   poweredByHeader: false,
   experimental: { serverActions: { bodySizeLimit: '3mb' } },
@@ -15,6 +16,15 @@ const config: NextConfig = {
           },
         ]
       : [],
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: `/:language(${prefixedLanguages.join('|')})/:path*`, destination: '/:path*' },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async headers() {
     return [
