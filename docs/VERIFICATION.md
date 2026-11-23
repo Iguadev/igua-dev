@@ -14,8 +14,8 @@ Checked 2026-11-06. Local-only scope; no hosted project modified.
 | Protected page responses              | Passed                 | 13 anonymous member/admin paths returned early 307 redirects to login                                                                                                       |
 | Missing page views                    | Passed                 | Three routes showed intentional missing-page UI and noindex; Next.js may stream these as HTTP 200 after loading starts                                                      |
 | Sensitive APIs                        | Passed                 | Unauthenticated email-job and attendee-export calls returned 401                                                                                                            |
-| Desktop browser                       | Reviewed               | Homepage at 1440×1000, event launch state, join navigation; saved preview-desktop.png                                                                                       |
-| Phone browser                         | Reviewed               | Homepage, join form, mobile navigation at 390×844; document/content width both 390 px; saved preview-mobile.png                                                             |
+| Desktop browser                       | Reviewed               | Homepage at 1440×1000, event launch state, join navigation                                                                                                                  |
+| Phone browser                         | Reviewed               | Homepage, join form, mobile navigation at 390×844; document/content width both 390 px                                                                                       |
 | Keyboard navigation                   | Passed                 | Enter opens menu, Escape closes it and restores focus to trigger                                                                                                            |
 | Browser errors                        | None observed          | Browser tool returned no error-level console entries in inspected journeys                                                                                                  |
 | OAuth / magic link                    | Not exercised live     | No IGUA.DEV Supabase provider configuration or credentials supplied                                                                                                         |
@@ -44,10 +44,6 @@ Member → validated action → PostgreSQL function → owner/role validation an
 
 Follow docs/DEPLOYMENT.md for provider setup, advisors, authenticated browser journeys, operational ownership and real contact details. The schema includes collaborator membership, project covers, partner logos and event resource fields; their complete management UI is not part of this first local implementation. QR check-in is modeled by tokens but no scanner is advertised. Account deletion is a request plus documented administrator operation, not instant automation. The implementation should be reviewed as a substantial local first version, not an already-operating production service.
 
-## Three.js enhancement — 2026-11-07
-
-The approved hero now supports a progressively loaded Three.js scene. TypeScript, 27 regression tests and the production build passed. Browser checks covered desktop/mobile rendering, pause/resume via keyboard, offscreen suspension, route cleanup and absence of console errors. The original static SVG is still server-rendered. See docs/THREE-CONFLUENCE.md for design choices, performance boundaries and verification limitations.
-
 ## Resources section — 2026-11-07
 
 Added `/recursos` and seven verified references, topic navigation, GET search, result counts and an intentional empty state. Search is insensitive to letter case and accents; category and query combine in the URL. Catalog entries live in `src/features/resources/catalog.ts` and require no connected services.
@@ -59,7 +55,7 @@ TypeScript, the existing 27 regression tests and production build passed. Local 
 
 33 tests pass, including locale routing, external URL preservation, reciprocal canonical/hreflang metadata, truthful organization data, English resource search and translation-key coverage. Strict TypeScript and the production webpack build pass. The HTTP check covers 11 English pages, spoofed locale-header rejection, English protected-route redirects, bilingual sitemap, robots, llms.txt and both localized social images. The original launch regression check also passes.
 
-Browser verification covered switching both directions, preserving query filters, searching English resource categories and internal English navigation. English homepage was reviewed at desktop and 320 px width with equal document/content widths, and no error-level console entries were observed. Saved preview-english.png and preview-english-mobile.png. A stale development metadata route after file replacement was resolved by restarting the preview with a clean development cache.
+Browser verification covered switching both directions, preserving query filters, searching English resource categories and internal English navigation. English homepage was reviewed at desktop and 320 px width with equal document/content widths, and no error-level console entries were observed. A stale development metadata route after file replacement was resolved by restarting the development server with a clean cache.
 
 Event/project text supplied by community authors remains in its original language; providers and authenticated sessions remain unconfigured. Search engine indexing and AI inclusion are not claimed.
 
@@ -67,4 +63,10 @@ Event/project text supplied by community authors remains in its original languag
 
 Added `/reglamento` and `/en/reglamento`, with original wording informed by https://salta.dev/reglamento/ and attribution on the page. The reference was fetched directly after the web reader could not access it. Covers scope, respectful learning, prohibited conduct, privacy, channel announcements, reporting, moderation/review and updates. No third-party contact information was copied. Dedicated reporting is explicitly unavailable until a real channel and responsible team are configured.
 
-Linked from Community, footer and registration; retained the existing community summary and its anchor for old links. Included in sitemap, language metadata, breadcrumbs and llms.txt. All 33 tests, TypeScript and production build pass. The HTTP suite now checks 12 English routes. Browser checks cover Spanish/English rendering, section links and preserved fragments when changing language, plus 390 px mobile layout without overflow. No console errors observed. Screenshots: preview-reglamento.png and preview-reglamento-mobile.png.
+Linked from Community, footer and registration; retained the existing community summary and its anchor for old links. Included in sitemap, language metadata, breadcrumbs and llms.txt. All 33 tests, TypeScript and production build pass. The HTTP suite now checks 12 English routes. Browser checks cover Spanish/English rendering, section links and preserved fragments when changing language, plus 390 px mobile layout without overflow. No console errors observed.
+
+## Triple Frontier map and localized homepages — 2026-11-23
+
+Checked the Spanish, Brazilian Portuguese and English homepages in Edge at 1440, 390 and 320 px. Each page served the expected document language and a localized image description. The map displayed Ciudad del Este, Foz do Iguaçu and Puerto Iguazú at every size. All labels fit within the image and the page stayed within the viewport.
+
+Strict TypeScript and all 34 unit and database tests passed. Playwright ran the launch suite against the local preview using Edge with desktop and mobile viewports. Eleven checks passed. The mobile navigation check runs only in the mobile project.

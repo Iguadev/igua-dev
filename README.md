@@ -2,7 +2,7 @@
 
 Una comunidad de tecnología desde Puerto Iguazú, Misiones, Argentina.
 
-A local-first implementation of the supplied build brief: custom dark visual identity, Spanish (Argentina) and English public website, member area, event registration and waitlists, project moderation, partnership inquiries and administration. No fictional public activity, people, endorsements or metrics. The four program proposals are marked “En preparación”.
+The public website is available in Argentine Spanish, Brazilian Portuguese and English. This local-first project includes a custom dark visual identity, a member area, event registration and waitlists, project moderation, partnership inquiries and administration. No fictional public activity, people, endorsements or metrics. The four program proposals are marked “En preparación”.
 
 ## Run locally
 
@@ -29,13 +29,12 @@ npm start
 
 ## Languages and discoverability
 
-Spanish uses the existing URLs; English starts at `/en`. The ES/EN switch preserves the equivalent page and filters. Interface and editorial launch copy are translated on the server. Authored community content retains its original language. See [SEO, GEO and translation maintenance](docs/SEO-GEO.md) for dictionaries, canonical/hreflang metadata, bilingual sitemap, structured data, localized social images and production indexing steps.
+Spanish pages use unprefixed URLs, Brazilian Portuguese pages start at `/pt`, and English pages start at `/en`. The language switch keeps the current page, filters and fragment. Community-authored content retains its original language. The multilingual sitemap, translation dictionaries, page metadata and social images are documented in [SEO, GEO and translation maintenance](docs/SEO-GEO.md).
 
 ## Included
 
 - All public, member and administrative routes requested in the brief, plus privacy and speaker/attendee management.
-- Custom SVG wordmark, standalone brand mark, original confluence/network visual, Geist Sans/Mono, semantic colors, mobile navigation with Radix focus management, reduced motion and visible keyboard focus.
-- A deferred Three.js enhancement brings the hero confluence to life with GPU-driven streams, shallow depth, pointer response and a keyboard-accessible pause control. The server-rendered SVG remains the fallback; motion stops offscreen and resources are disposed on navigation. See [design and implementation notes](docs/THREE-CONFLUENCE.md).
+- Custom SVG wordmark and symbol, responsive footage of Iguazú Falls, and an illustrated map of the Triple Frontier. Mobile navigation supports keyboard focus, Escape and reduced motion.
 - Supabase SSR session refresh, GitHub/Google OAuth and email links; lightweight onboarding, opt-in public profiles, private preferences and avatar storage, account deletion requests.
 - Separate event lifecycle and registration status; server/database validation; atomic capacity enforcement, idempotent registrations, cancellations and FIFO waitlist promotion; confirmation UI and durable email outbox.
 - Event forms, venues, speakers, covers, recaps, attendance and safe CSV export.
@@ -56,6 +55,6 @@ The code is ready for local review. Connecting providers and validating authenti
 
 ## Resources library
 
-`/recursos` contains the seven external references supplied for the community, with Spanish descriptions, topic filters, language/format labels and accent-insensitive search. Search uses a server-rendered GET form; results are shareable and work without a client-side search library. The header, mobile menu, footer and sitemap link to it.
+`/recursos`, `/pt/recursos` and `/en/recursos` share the same seven external references, with localized descriptions, topic filters, language/format labels and accent-insensitive search. Search uses a server-rendered GET form; results are shareable and work without a client-side search library. The header, mobile menu, footer and sitemap link to it.
 
 To add or edit links, update `src/features/resources/catalog.ts`. Each entry supplies its URL, publisher, category, language, format, description and search tags. Verify the destination and update the reviewed-date copy in the route when performing a new link review. The original Anthropic blog URL currently redirects to `https://code.claude.com/docs/en/best-practices`; the catalog uses that current destination. External references are not partners or endorsements.
