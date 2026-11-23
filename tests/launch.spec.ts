@@ -1,4 +1,18 @@
 import { test, expect } from '@playwright/test';
+
+for (const [path, language] of [['/', 'es-AR'], ['/pt', 'pt-BR'], ['/en', 'en']]) {
+  test(`serves the three-city map in ${language}`, async ({ page }) => {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('html')).toHaveAttribute('lang', language);
+    await expect(page.locator('#triple-frontera .frontier-city')).toHaveText([
+      'Ciudad del Este',
+      'Foz do Iguaçu',
+      'Puerto Iguazú',
+    ]);
+  });
+}
+
 test('launch journey is honest and public routes are accessible', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -31,12 +45,17 @@ test('protects member and administrative routes without credentials', async ({ p
   const cron = await request.get('/api/jobs/email');
   expect(cron.status()).toBe(401);
 });
-test('mobile navigation opens and closes with an accessible dialog', async ({ page, isMobile }) => {
+test('mobile navigation expands and closes when following a link', async ({ page, isMobile }) => {
   test.skip(!isMobile);
   await page.goto('/');
-  await page.getByRole('button', { name: 'Abrir menú' }).click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.getByRole('dialog').getByRole('link', { name: 'Programas', exact: true }).click();
-  await expect(page.getByRole('dialog')).not.toBeVisible();
+  const openMenu = page.getByRole('button', { name: 'Abrir menú' });
+  const navigation = page.getByRole('navigation', { name: 'Navegación móvil' });
+  await expect(openMenu).toHaveAttribute('aria-expanded', 'false');
+  await openMenu.click();
+  await expect(page.getByRole('button', { name: 'Cerrar menú' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(navigation).toBeVisible();
+  await navigation.getByRole('link', { name: 'Programas', exact: true }).click();
+  await expect(openMenu).toHaveAttribute('aria-expanded', 'false');
+  await expect(navigation).toBeHidden();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Muchos caminos.');
 });
