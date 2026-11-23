@@ -1,35 +1,23 @@
 export function Symbol({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path
-        d="m8 8 12 12L32 8M20 20v15M8 8v12l12 12 12-12V8"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-      <circle cx="20" cy="20" r="3" fill="currentColor" />
-    </svg>
+    <img
+      className={className}
+      src="/brand/symbol-reverse.svg"
+      alt=""
+      width={240}
+      height={200}
+      aria-hidden="true"
+    />
   );
 }
 export function Wordmark() {
   return (
-    <svg viewBox="0 0 223 40" role="img" aria-label="IGUA.DEV" className="wordmark">
-      <g fill="currentColor">
-        <path d="M1 7h5v26H1zm23 0c6 0 10 3 11 7l-5 2c-1-3-3-4-6-4-5 0-8 3-8 8s3 8 8 8c3 0 5-1 6-3v-3h-7v-5h12v11c-3 4-6 6-11 6-8 0-13-6-13-14S16 7 24 7zm17 0h5v16c0 4 2 6 6 6s6-2 6-6V7h5v16c0 7-4 11-11 11s-11-4-11-11zm37 0h6l11 26h-6l-2-6H75l-2 6h-6zm-1 15h8l-4-10z" />
-      </g>
-      <rect
-        x="101"
-        y="3"
-        width="121"
-        height="34"
-        rx="3"
-        fill="currentColor"
-        className="wordmark-dev"
-      />
-      <g fill="#0B1016">
-        <circle cx="112" cy="27" r="2.5" />
-        <path d="M122 10h8c8 0 12 4 12 10s-4 10-12 10h-8zm5 5v10h3c5 0 7-2 7-5s-2-5-7-5zm21-5h19v5h-14v3h12v4h-12v3h14v5h-19zm23 0h6l7 14 7-14h6l-10 20h-6z" />
-      </g>
-    </svg>
+    <img
+      className="wordmark"
+      src="/brand/wordmark-reverse.svg"
+      alt="IGUA.DEV"
+      width={744}
+      height={200}
+    />
   );
 }

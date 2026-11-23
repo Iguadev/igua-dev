@@ -17,7 +17,9 @@ for (const route of [
   '/sitemap.xml',
   '/opengraph-image',
   '/brand/symbol.svg',
+  '/brand/symbol-reverse.svg',
   '/brand/wordmark.svg',
+  '/brand/wordmark-reverse.svg',
 ]) {
   const response = await fetch(new URL(route, base));
   assert.equal(response.status, 200, route);
