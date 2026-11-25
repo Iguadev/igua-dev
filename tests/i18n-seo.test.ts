@@ -7,10 +7,33 @@ import ui from '../src/lib/i18n/en-ui.json';
 import portuguese from '../src/lib/i18n/pt.json';
 import portugueseUi from '../src/lib/i18n/pt-ui.json';
 import { languagePath, stripLanguage, translator } from '../src/lib/i18n/routing';
-import { localizeMetadata, languageAlternates, siteEntities } from '../src/lib/seo';
+import {
+  localizeMetadata,
+  languageAlternates,
+  siteEntities,
+  faqEntities,
+  eventEntities,
+  projectEntities,
+} from '../src/lib/seo';
 import { findResources, resources, resourceCategories } from '../src/features/resources/catalog';
+import { productionSiteUrl } from '../src/lib/env';
+import { sitemapEntries, publicSitemapPaths } from '../src/lib/sitemap';
 
 describe('language routing and discoverability', () => {
+  it('uses the www production origin without a trailing slash', () => {
+    expect(productionSiteUrl).toBe('https://www.iguazu.dev');
+  });
+  it('lists public pages on the production origin for crawlers', () => {
+    const entries = sitemapEntries();
+    expect(publicSitemapPaths).toContain('/recursos');
+    expect(entries.some((entry) => entry.url === 'https://www.iguazu.dev/')).toBe(true);
+    expect(entries.some((entry) => entry.url === 'https://www.iguazu.dev/en/about')).toBe(true);
+    expect(entries.some((entry) => entry.url === 'https://www.iguazu.dev/pt/join')).toBe(true);
+    expect(entries.every((entry) => entry.url.startsWith('https://www.iguazu.dev'))).toBe(true);
+    expect(entries.find((entry) => entry.url === 'https://www.iguazu.dev/en/about')?.alternates?.languages?.en).toBe(
+      'https://www.iguazu.dev/en/about',
+    );
+  });
   it('keeps equivalent pages, queries and fragments in both languages', () => {
     expect(languagePath('en', '/partners#colaborar')).toBe('/en/partners#colaborar');
     expect(languagePath('es', '/en/recursos?q=Git&tema=git')).toBe('/recursos?q=Git&tema=git');
@@ -49,10 +72,9 @@ describe('language routing and discoverability', () => {
     );
     expect(m.title).toBe('Our story');
     expect(m.alternates?.canonical).toBe('/en/about');
-    expect(m.alternates?.languages).toEqual(languageAlternates('/about'));
-    expect(String(languageAlternates('/about').en)).toMatch(/\/en\/about$/);
-    expect(String(languageAlternates('/about')['es-AR'])).toMatch(/\/about$/);
-    expect(String(languageAlternates('/about')['pt-BR'])).toMatch(/\/pt\/about$/);
+    expect(languageAlternates('/about').en).toBe('https://www.iguazu.dev/en/about');
+    expect(languageAlternates('/about')['es-AR']).toBe('https://www.iguazu.dev/about');
+    expect(languageAlternates('/about')['pt-BR']).toBe('https://www.iguazu.dev/pt/about');
     expect(m.openGraph?.locale).toBe('en_US');
     const pt = localizeMetadata({ title: 'Nuestra historia', alternates: { canonical: '/about' } }, 'pt');
     expect(pt.alternates?.canonical).toBe('/pt/about');
@@ -73,7 +95,55 @@ describe('language routing and discoverability', () => {
       },
     });
     expect(org).not.toHaveProperty('telephone');
+    expect(org).not.toHaveProperty('email');
     expect(org).not.toHaveProperty('numberOfEmployees');
+    expect(org).not.toHaveProperty('sameAs');
+    expect(schema['@graph'][0]).toMatchObject({
+      knowsAbout: expect.arrayContaining(['software engineering']),
+    });
+    expect(schema['@graph'][1]).toMatchObject({
+      potentialAction: {
+        target: {
+          urlTemplate: expect.stringMatching(/\/en\/recursos\?q=\{search_term_string\}$/),
+        },
+      },
+    });
+    const faq = faqEntities('es', [
+      { question: '¿Qué es IGUA.DEV?', answer: 'Una comunidad independiente de tecnología.' },
+    ]);
+    expect(faq['@id']).toMatch(/\/about#faq$/);
+    expect(faq['@id']).not.toMatch(/#webpage$/);
+    expect(
+      eventEntities('es', {
+        slug: 'meetup',
+        title: 'Meetup',
+        description: 'Encuentro comunitario.',
+        starts_at: '2026-12-01T19:00:00-03:00',
+        ends_at: '2026-12-01T21:00:00-03:00',
+        status: 'completed',
+        venues: null,
+      }).eventStatus,
+    ).toBe('https://schema.org/EventCompleted');
+    expect(
+      eventEntities('en', {
+        slug: 'meetup',
+        title: 'Meetup',
+        description: 'Community meetup.',
+        starts_at: '2026-12-01T19:00:00-03:00',
+        ends_at: '2026-12-01T21:00:00-03:00',
+        status: 'published',
+        venues: { name: 'Casa de la Cultura', address: 'Puerto Iguazú' },
+      }).eventAttendanceMode,
+    ).toBe('https://schema.org/OfflineEventAttendanceMode');
+    const project = projectEntities('pt', {
+      slug: 'demo',
+      title: 'Demo',
+      description: 'Um projeto da comunidade.',
+      github_url: 'https://github.com/example/demo',
+      demo_url: null,
+    });
+    expect(project['@type']).toBe('CreativeWork');
+    expect(project.sameAs).toEqual(['https://github.com/example/demo']);
   });
   it('searches the visible English resource descriptions', () => {
     const t = translator('en', english);

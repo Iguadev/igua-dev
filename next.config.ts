@@ -17,6 +17,16 @@ const config: NextConfig = {
         ]
       : [],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'iguazu.dev' }],
+        destination: 'https://www.iguazu.dev/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [

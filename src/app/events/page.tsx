@@ -1,6 +1,8 @@
 import { languagePath } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
-import { localizeMetadata } from '@/lib/seo';
+import { itemListEntities, localizeMetadata } from '@/lib/seo';
+import { JsonLd } from '@/components/json-ld';
+import { productionSiteUrl } from '@/lib/env';
 import Link from '@/components/localized-link';
 import { PageIntro, EmptyState, EventCards } from '@/components/sections';
 import { events } from '@/lib/data';
@@ -33,6 +35,19 @@ export default async function Events({
   );
   return (
     <div className="container page-content">
+      {selected.length ? (
+        <JsonLd
+          data={itemListEntities(
+            language,
+            '/events',
+            t('Encuentros y eventos'),
+            selected.map((event) => ({
+              name: event.title,
+              url: new URL(languagePath(language, `/events/${event.slug}`), productionSiteUrl).href,
+            })),
+          )}
+        />
+      ) : null}
       <PageIntro
         label={t('Nos encontramos para hacer')}
         title={t('Buenas conversaciones. Mejores conexiones.')}

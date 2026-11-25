@@ -1,7 +1,12 @@
 import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
-const pageMetadata = { title: 'Privacidad', alternates: { canonical: '/privacy' } };
+const pageMetadata = {
+  title: 'Privacidad',
+  description:
+    'IGUA.DEV solicita los datos necesarios para gestionar tu cuenta, tus inscripciones y los proyectos que compartís. No vendemos tus datos ni compartimos tu email con aliados.',
+  alternates: { canonical: '/privacy' },
+};
 export async function generateMetadata() {
   const { language } = await getI18n();
   return localizeMetadata(pageMetadata, language);

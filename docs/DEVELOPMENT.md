@@ -2,7 +2,7 @@
 
 ## Read-only preview
 
-`npm ci && npm run dev` works with no secrets. Use http://localhost:3000. Empty content is intentional, not mock data. `NEXT_PUBLIC_SITE_URL` defaults to that origin.
+`npm ci && npm run dev` works with no secrets. Use http://localhost:3000. Empty content is intentional, not mock data. `NEXT_PUBLIC_SITE_URL` defaults to that origin locally; production canonical is https://www.iguazu.dev.
 
 ## Local Supabase
 

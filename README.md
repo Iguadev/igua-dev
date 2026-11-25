@@ -1,60 +1,150 @@
 # IGUA.DEV
 
-Una comunidad de tecnología desde Puerto Iguazú, Misiones, Argentina.
+**El futuro también se construye desde acá.**
 
-The public website is available in Argentine Spanish, Brazilian Portuguese and English. This local-first project includes a custom dark visual identity, a member area, event registration and waitlists, project moderation, partnership inquiries and administration. No fictional public activity, people, endorsements or metrics. The four program proposals are marked “En preparación”.
+Comunidad independiente y abierta de tecnología con base en **Puerto Iguazú, Misiones, Argentina**. Conecta a developers, estudiantes, diseñadores, founders y personas curiosas por la tecnología, con los pies en la Triple Frontera y la mirada en el mundo.
 
-## Run locally
+Sitio público: **[https://www.iguazu.dev](https://www.iguazu.dev/)**. Español argentino (URLs sin prefijo), portugués de Brasil (`/pt`) e inglés (`/en`). Membresía gratuita. Sin actividad, personas, alianzas, testimonios ni métricas inventadas: si algo no está confirmado, la interfaz lo dice.
 
-Requires Node.js 22.12+ and npm.
+> El origen canónico de producción es `https://www.iguazu.dev`. Registro, OAuth, email y administración se habilitan cuando hay un proyecto de Supabase propio de IGUA.DEV.
+
+## Qué incluye
+
+| Área | Qué hace |
+| --- | --- |
+| Sitio público | Inicio, nosotros, eventos, programas, proyectos, comunidad, reglamento, recursos, alianzas, registro y privacidad |
+| Miembros | Onboarding, perfil opt-in, preferencias, avatar, proyectos propios, inscripciones |
+| Eventos | Ciclo de vida, cupos atómicos, lista de espera FIFO, cancelación, speakers, portadas, recap y export CSV |
+| Administración | Eventos, sedes, miembros, moderación de proyectos, aliados, copy editorial y pedidos de baja |
+| Descubrimiento | Metadata localizada, hreflang, sitemap, robots, JSON-LD, imágenes sociales y `/llms.txt` |
+
+Los cuatro programas (software, IA, tecnologías emergentes, emprendimiento) se muestran como **en preparación** hasta que existan actividades confirmadas.
+
+## Stack
+
+- **App:** Next.js 16 (App Router), React 19, TypeScript estricto, Tailwind CSS 4
+- **Datos:** PostgreSQL + Supabase Auth/Storage, RLS, funciones en schema `private`
+- **Email:** cola durable + Resend (idempotente)
+- **Observabilidad:** Sentry (opcional), Vercel Analytics solo en Vercel
+- **Tests:** Vitest + PGlite (RLS), PostgreSQL nativo para concurrencia, Playwright para el preview de lanzamiento
+
+## Requisitos
+
+- Node.js **22.12+** y npm
+- Docker Desktop solo si querés el stack local completo de Supabase
+- Puerto loopback libre para `npm run test:concurrency` (55439)
+
+## Arranque local
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. The app works without environment variables as an honest read-only launch preview. Registration buttons clearly explain that access is not enabled. Protected routes redirect to login. No localStorage membership, fake success messages or demo authentication.
+Abrí [http://localhost:3000](http://localhost:3000). **Sin variables de entorno** el sitio es un preview de lectura: estados vacíos honestos, botones de registro que explican que el acceso no está habilitado, y las rutas protegidas redirigen a login. No hay membresía en `localStorage`, mensajes de éxito fingidos ni autenticación demo.
 
-To enable integrations, copy `.env.example` to `.env.local`, configure an **IGUA.DEV-specific** Supabase project and follow [deployment instructions](docs/DEPLOYMENT.md). Existing connected projects were not modified. Rebuild after changing public environment variables.
+Para habilitar integraciones:
 
 ```sh
-npm run typecheck
-npm test
-npm run test:concurrency
-npm run build
-npm start
+cp .env.example .env.local
 ```
 
-`npm test` runs validation and PostgreSQL/RLS integration tests in PGlite. `test:concurrency` starts a temporary native PostgreSQL instance and opens 24 actual simultaneous sessions, with only disposable fictional test data. It requires permission to bind a loopback port. No hosted service credentials are used. Build uses the supported webpack builder because Turbopack's worker could not bind its internal port in the authoring environment; development uses Turbopack successfully.
+Configurá un proyecto de Supabase **exclusivo de IGUA.DEV**. No reutilices otro proyecto conectado. Después de cambiar variables `NEXT_PUBLIC_*`, reconstruí. Guía: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-## Languages and discoverability
+## Scripts
 
-Spanish pages use unprefixed URLs, Brazilian Portuguese pages start at `/pt`, and English pages start at `/en`. The language switch keeps the current page, filters and fragment. Community-authored content retains its original language. The multilingual sitemap, translation dictionaries, page metadata and social images are documented in [SEO, GEO and translation maintenance](docs/SEO-GEO.md).
+| Comando | Uso |
+| --- | --- |
+| `npm run dev` | Preview con Turbopack en `0.0.0.0:3000` |
+| `npm run build` | Build de producción (webpack; ver nota abajo) |
+| `npm start` | Servir el build |
+| `npm run typecheck` | TypeScript estricto |
+| `npm test` | Validación + políticas PostgreSQL en PGlite |
+| `npm run test:concurrency` | 24 sesiones reales contra PostgreSQL nativo temporal |
+| `npm run test:e2e` | Playwright (instalar browsers; preview sin configurar) |
+| `npm run format` | Prettier |
+| `npx supabase migration new <nombre>` | Nueva migración (revisá la ayuda del CLI v3 antes) |
 
-## Included
+El build usa webpack porque el worker interno de Turbopack no pudo bindear su puerto en el entorno de autoría. `next dev` sí usa Turbopack.
 
-- All public, member and administrative routes requested in the brief, plus privacy and speaker/attendee management.
-- Custom SVG wordmark and symbol, responsive footage of Iguazú Falls, and an illustrated map of the Triple Frontier. Mobile navigation supports keyboard focus, Escape and reduced motion.
-- Supabase SSR session refresh, GitHub/Google OAuth and email links; lightweight onboarding, opt-in public profiles, private preferences and avatar storage, account deletion requests.
-- Separate event lifecycle and registration status; server/database validation; atomic capacity enforcement, idempotent registrations, cancellations and FIFO waitlist promotion; confirmation UI and durable email outbox.
-- Event forms, venues, speakers, covers, recaps, attendance and safe CSV export.
-- Owner-scoped project submissions/edits that return to moderation; administrator-only publication.
-- Database-managed programs, event associations, partners, inquiries and selected public copy.
-- Database roles, explicit RLS, server authorization, audit trails, persistent rate limits, safe error responses and private image buckets.
-- Metadata, sitemap, robots, organization/event structured data, branded social image, optional Vercel Analytics and Sentry, Resend outbox worker.
+`npm test` no demuestra transacciones concurrentes reales: para eso existe `test:concurrency`, con datos de fixture descartables. Nunca uses credenciales de un servicio hosteado en esos tests.
 
-## Handoff
+## Variables de entorno
 
-- [Architecture and security](docs/ARCHITECTURE.md)
-- [Local development and tests](docs/DEVELOPMENT.md)
-- [Integration and deployment](docs/DEPLOYMENT.md)
-- [Verification and remaining work](docs/VERIFICATION.md)
-- [Implementation plan and regional sources](docs/PLAN.md)
+Definidas en `.env.example`. Nada de esto va al cliente salvo las claves `NEXT_PUBLIC_*`.
 
-The code is ready for local review. Connecting providers and validating authenticated browser journeys against a real Supabase stack remain required before public launch. This is not a claim that unconfigured third-party services are working.
+| Variable | Rol |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Origen canónico. Local: `http://localhost:3000`. Producción: `https://www.iguazu.dev` |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Cliente público. Si faltan, preview de solo lectura |
+| `SUPABASE_SECRET_KEY` | Servidor: consultas anónimas de alianzas, rate limits, outbox. No bypass de autorización de miembros |
+| `RATE_LIMIT_SECRET` | ≥32 caracteres; hashea buckets de rate limit |
+| `RESEND_API_KEY` / `RESEND_FROM` | Entrega de la cola. Sin clave, no se envía mail real |
+| `CRON_SECRET` | Bearer obligatorio en `/api/jobs/email` |
+| `NEXT_PUBLIC_SENTRY_DSN` y `SENTRY_*` | Observabilidad opcional |
 
-## Resources library
+## Arquitectura (mapa corto)
 
-`/recursos`, `/pt/recursos` and `/en/recursos` share the same seven external references, with localized descriptions, topic filters, language/format labels and accent-insensitive search. Search uses a server-rendered GET form; results are shareable and work without a client-side search library. The header, mobile menu, footer and sitemap link to it.
+```
+src/app/                 rutas App Router (páginas, sitemap, robots, llms.txt, OG)
+src/features/*/actions.ts  mutaciones de dominio (auth, members, events, projects, partners, admin)
+src/lib/                 datos, i18n, SEO, Supabase, env
+src/components/          UI; interactividad acotada (nav, forms, motion)
+supabase/                migraciones y seed vacío de actividad ficticia
+```
 
-To add or edit links, update `src/features/resources/catalog.ts`. Each entry supplies its URL, publisher, category, language, format, description and search tags. Verify the destination and update the reviewed-date copy in the route when performing a new link review. The original Anthropic blog URL currently redirects to `https://code.claude.com/docs/en/best-practices`; the catalog uses that current destination. External references are not partners or endorsements.
+- Server Components por defecto. Client Components solo donde hace falta el browser.
+- Cada Server Action autentica y autoriza. RLS es un segundo límite. Roles salen de `member_roles`, no de `user_metadata`.
+- Inscripción y cancelación: `FOR UPDATE` sobre el evento, después se cuenta y se escribe.
+- SQL privilegiado en `private` con `search_path` vacío y wrappers `SECURITY INVOKER`.
+
+Detalle: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Idiomas
+
+El español es el idioma fuente. `src/lib/i18n/pt.json` y `en.json` cubren el servidor; `*-ui.json` cubre el cliente. El proxy toma el idioma de la URL (`x-igua-language`). El contenido escrito por la comunidad (eventos, proyectos) se deja en el idioma original, con un aviso en `/pt` y `/en`.
+
+El switch de idioma conserva ruta, query y fragment. Enlaces internos respetan el idioma activo.
+
+## SEO y AEO
+
+- Canonical + `hreflang` (`es-AR`, `pt-BR`, `en`, `x-default` → español)
+- Sitemap trilingüe de páginas públicas, eventos y proyectos publicados
+- `robots.txt` bloquea `/login`, `/dashboard`, `/admin`, `/api`, `/auth` en los tres idiomas
+- JSON-LD: Organization, WebSite + SearchAction de la biblioteca, WebPage, breadcrumbs, FAQ, Event, CreativeWork, ItemList
+- Preguntas visibles en `/about` (misma fuente que FAQPage)
+- `/llms.txt` con hechos y enlaces públicos, sin métricas ni gente inventada
+- Vistas filtradas (`q`, `tema`) y áreas privadas: `noindex`
+- Imágenes sociales localizadas en `/social/{es,pt,en}`
+
+Esto mejora crawlability y respuestas factuales. **No garantiza** ranking ni inclusión en resúmenes de IA. El sitemap a enviar es `https://www.iguazu.dev/sitemap.xml`. Documentación: [docs/SEO-GEO.md](docs/SEO-GEO.md).
+
+## Seguridad (no negociable)
+
+- Secretos solo en entorno, nunca en código de cliente ni archivos trackeados
+- Buckets de avatares y portadas privados; MIME allowlist; SVG/HTML de usuarias rechazados
+- Rate limits persistentes; en Vercel solo se confía el IP que pisa la plataforma
+- Baja de cuenta: pedido + operación administrativa (archivos, sesiones, auth), no borrado instantáneo disfrazado
+- No tocar un proyecto de Supabase que no sea de IGUA.DEV
+
+## Deploy
+
+Dominio canónico: `www.iguazu.dev` (el apex `iguazu.dev` redirige con 308). En Vercel, Node ≥22.12, `NEXT_PUBLIC_SITE_URL=https://www.iguazu.dev` en Production, variables distintas para preview, primer admin por consola SQL de confianza. Cron cada 10 minutos contra `/api/jobs/email`. Checklist: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Documentación
+
+| Doc | Contenido |
+| --- | --- |
+| [AGENTS.md](AGENTS.md) | Contrato para agentes y convenciones del repo |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Límites de runtime, RLS, inscripciones, email |
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Preview, Supabase local, comandos de verificación |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Proveedores, admin bootstrap, cron, bajas |
+| [docs/SEO-GEO.md](docs/SEO-GEO.md) | i18n, SEO, AEO, llms.txt |
+| [docs/VERIFICATION.md](docs/VERIFICATION.md) | Qué se verificó y qué falta para un lanzamiento público |
+| [docs/PLAN.md](docs/PLAN.md) | Plan original e investigación regional |
+
+Para agregar o editar la biblioteca: `src/features/resources/catalog.ts`. Verificá el destino y actualizá la fecha de revisión en la ruta. Los enlaces no son alianzas.
+
+## Contribuir
+
+Copy pública: español argentino, voseo natural, acentos y el tagline intactos. No completes vacíos con gente, eventos o números de muestra. Después de un cambio no trivial: `npm run typecheck`, `npm test` y `npm run build`. Si tocás cupos o locks: `npm run test:concurrency`.

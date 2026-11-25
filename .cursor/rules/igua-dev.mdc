@@ -1,0 +1,15 @@
+---
+description: IGUA.DEV product, security, i18n and SEO conventions for every change
+alwaysApply: true
+---
+
+# IGUA.DEV
+
+Read `AGENTS.md` before editing. Public language is Argentine Spanish (voseo, accents, tagline). Portuguese is `/pt`, English is `/en`. Canonical site: `https://www.iguazu.dev`.
+
+- Do not invent people, events, partners, testimonials, stats, emails, or social profiles in UI, metadata, JSON-LD, or `llms.txt`.
+- Server Components first. Domain writes only in `src/features/*/actions.ts`, each self-authorized. Roles come from `member_roles`, never `user_metadata`.
+- Registration/cancellation must `FOR UPDATE` the event row before counting seats.
+- Local-only: never touch an unrelated hosted Supabase or Vercel project. Secrets stay in env.
+- New `t('…')` / metadata strings need matching keys in `src/lib/i18n/{en,pt}.json` (and `*-ui.json` for client components).
+- After nontrivial work: `npm run typecheck`, `npm test`, `npm run build`. Seat/lock changes also need `npm run test:concurrency`.

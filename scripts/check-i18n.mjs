@@ -44,12 +44,15 @@ for (const path of ['/en/admin', '/en/dashboard', '/en/dashboard/profile']) {
   assert.equal(new URL(r.headers.get('location'), base).pathname, '/en/login');
 }
 const sm = await (await fetch(new URL('/sitemap.xml', base))).text();
-assert.ok(sm.includes(`${base}/en/partners`));
+assert.ok(sm.includes('https://www.iguazu.dev/en/partners'));
+assert.ok(!sm.includes('localhost'));
 assert.ok(sm.includes('hreflang="en"'));
 const llms = await (await fetch(new URL('/llms.txt', base))).text();
-assert.ok(llms.includes(`${base}/en/about`));
+assert.ok(llms.includes('https://www.iguazu.dev/en/about'));
+assert.ok(!llms.includes('localhost'));
 const robots = await (await fetch(new URL('/robots.txt', base))).text();
 assert.ok(robots.includes('Disallow: /en/admin'));
+assert.ok(robots.includes('https://www.iguazu.dev/sitemap.xml'));
 for (const language of ['es', 'en']) {
   const r = await fetch(new URL(`/social/${language}`, base));
   assert.equal(r.status, 200);

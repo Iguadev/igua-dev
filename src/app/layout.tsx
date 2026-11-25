@@ -31,10 +31,23 @@ export async function generateMetadata(): Promise<Metadata> {
         'Código, comunidad y oportunidades. Una comunidad abierta de developers, creadores y personas curiosas por la tecnología en Puerto Iguazú, Misiones.',
       alternates: { canonical: path },
       icons: { icon: '/brand/symbol.svg' },
+      robots:
+        process.env.VERCEL_ENV === 'preview'
+          ? { index: false, follow: false }
+          : { index: true, follow: true, googleBot: { index: true, follow: true } },
+      verification: {
+        ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+          ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+          : {}),
+        ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+          ? { other: { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+          : {}),
+      },
     },
     language,
   );
   if (
+    process.env.VERCEL_ENV === 'preview' ||
     /^\/(dashboard|admin|login|auth|api)(?:\/|$)/.test(path) ||
     h.get('x-igua-filtered') === 'true'
   )

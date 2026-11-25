@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { db } from '@/lib/supabase/server';
 export type Event = {
   id: string;
@@ -77,7 +78,7 @@ export const programIdeas: Program[] = [
     accent: 'orange',
   },
 ];
-export async function events() {
+export const events = cache(async function events() {
   const client = await db();
   if (!client) return [] as Event[];
   const { data, error } = await client
@@ -87,8 +88,8 @@ export async function events() {
     .order('starts_at');
   if (error) throw new Error('Could not load events');
   return (data ?? []) as Event[];
-}
-export async function projects() {
+});
+export const projects = cache(async function projects() {
   const client = await db();
   if (!client) return [] as Project[];
   const { data, error } = await client
@@ -99,8 +100,8 @@ export async function projects() {
     .order('created_at', { ascending: false });
   if (error) throw new Error('Could not load projects');
   return (data ?? []) as Project[];
-}
-export async function programs() {
+});
+export const programs = cache(async function programs() {
   const client = await db();
   if (!client) return programIdeas;
   const { data, error } = await client
@@ -110,8 +111,8 @@ export async function programs() {
     .order('sort_order');
   if (error) throw new Error('Could not load programs');
   return (data ?? []) as Program[];
-}
-export async function partners() {
+});
+export const partners = cache(async function partners() {
   const client = await db();
   if (!client) return [];
   const { data, error } = await client
@@ -120,8 +121,8 @@ export async function partners() {
     .eq('approved', true);
   if (error) throw new Error('Could not load partners');
   return data ?? [];
-}
-export async function content(slug: string) {
+});
+export const content = cache(async function content(slug: string) {
   const client = await db();
   if (!client) return null;
   const { data, error } = await client
@@ -132,4 +133,4 @@ export async function content(slug: string) {
     .maybeSingle();
   if (error) throw new Error('Could not load content');
   return data;
-}
+});

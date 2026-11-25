@@ -1,8 +1,7 @@
 import { JsonLd } from '@/components/json-ld';
-import { siteUrl } from '@/lib/env';
 import { languagePath, pick } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
-import { localizeMetadata } from '@/lib/seo';
+import { faqEntities, localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
 import { ClosingCTA, PageIntro } from '@/components/sections';
 import { content } from '@/lib/data';
@@ -186,18 +185,7 @@ export default async function About() {
             })}
           </Link>
         </section>
-        <JsonLd
-          data={{
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            '@id': new URL(languagePath(language, '/about'), siteUrl).href + '#webpage',
-            mainEntity: faqs.map((faq) => ({
-              '@type': 'Question',
-              name: faq.question,
-              acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-            })),
-          }}
-        />
+        <JsonLd data={faqEntities(language, faqs)} />
       </div>
       <ClosingCTA />
     </>

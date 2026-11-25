@@ -1,6 +1,7 @@
+import { cache } from 'react';
 import { getI18n } from '@/lib/i18n/server';
 import { languagePath, languageTags, pick } from '@/lib/i18n/routing';
-import { localizeMetadata } from '@/lib/seo';
+import { eventEntities, localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -9,11 +10,11 @@ import { identity } from '@/features/auth/guards';
 import { registrationAction } from '@/features/events/actions';
 import { ActionForm } from '@/components/action-form';
 import { Button } from '@/components/ui/button';
+import { JsonLd } from '@/components/json-ld';
 import { PageIntro } from '@/components/sections';
 import { eventDate } from '@/lib/utils';
-import { siteUrl } from '@/lib/env';
 import type { Event } from '@/lib/data';
-async function findEvent(slug: string) {
+const findEvent = cache(async (slug: string) => {
   const client = await db();
   if (!client) return null;
   const { data, error } = await client
@@ -24,46 +25,49 @@ async function findEvent(slug: string) {
     .maybeSingle();
   if (error) throw new Error('Could not load event');
   return data as Event | null;
-}
+});
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { t, language } = await getI18n();
-  const { slug } = await params;
+  const [{ t, language }, { slug }] = await Promise.all([getI18n(), params]);
   const event = await findEvent(slug);
   return localizeMetadata(
     {
       title: event?.title || t('Evento no encontrado'),
       description: event?.description.slice(0, 160),
       alternates: { canonical: `/events/${slug}` },
+      ...(event ? {} : { robots: { index: false, follow: true } }),
     },
     language,
   );
 }
 export default async function EventDetail({ params }: { params: Promise<{ slug: string }> }) {
-  const { t, language } = await getI18n();
-  const { slug } = await params;
+  const [{ t, language }, { slug }, member] = await Promise.all([getI18n(), params, identity()]);
   const event = await findEvent(slug);
   if (!event) notFound();
-  const member = await identity();
-  const client = await db();
-  const { data: registration } = member
-    ? await member.client
-        .from('event_registrations')
-        .select('status')
-        .eq('event_id', event.id)
-        .eq('member_id', member.user.id)
-        .maybeSingle()
-    : { data: null };
-  const { data: speakers, error } = client
-    ? await client.from('event_speakers').select('id,display_name,bio').eq('event_id', event.id)
-    : { data: [], error: null };
-  if (error) throw new Error('Could not load speakers');
-  const { data: cover } =
+  const client = member?.client ?? (await db());
+  const [registrationResult, speakersResult, coverResult, availabilityResult] = await Promise.all([
+    member
+      ? member.client
+          .from('event_registrations')
+          .select('status')
+          .eq('event_id', event.id)
+          .eq('member_id', member.user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    client
+      ? client.from('event_speakers').select('id,display_name,bio').eq('event_id', event.id)
+      : Promise.resolve({ data: [] as { id: string; display_name: string; bio: string }[], error: null }),
     event.cover_path && client
-      ? await client.storage.from('covers').createSignedUrl(event.cover_path, 3600)
-      : { data: null };
-  const { data: available } = client
-    ? await client.rpc('event_availability', { p_event: event.id })
-    : { data: null };
+      ? client.storage.from('covers').createSignedUrl(event.cover_path, 3600)
+      : Promise.resolve({ data: null }),
+    client
+      ? client.rpc('event_availability', { p_event: event.id })
+      : Promise.resolve({ data: null }),
+  ]);
+  const registration = registrationResult.data;
+  const speakers = speakersResult.data;
+  if ('error' in speakersResult && speakersResult.error) throw new Error('Could not load speakers');
+  const cover = coverResult.data;
+  const available = availabilityResult.data;
   const now = Date.now();
   const open =
     event.status === 'published' &&
@@ -72,27 +76,9 @@ export default async function EventDetail({ params }: { params: Promise<{ slug: 
     (!event.registration_opens_at || now >= Date.parse(event.registration_opens_at)) &&
     (!event.registration_closes_at || now < Date.parse(event.registration_closes_at));
   const registered = registration && registration.status !== 'cancelled';
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Event',
-    name: event.title,
-    description: event.description,
-    startDate: event.starts_at,
-    endDate: event.ends_at,
-    eventStatus: `https://schema.org/${event.status === 'cancelled' ? 'EventCancelled' : 'EventScheduled'}`,
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    ...(event.venues
-      ? { location: { '@type': 'Place', name: event.venues.name, address: event.venues.address } }
-      : {}),
-    organizer: { '@type': 'Organization', name: 'IGUA.DEV', url: siteUrl },
-    url: new URL(languagePath(language, `/events/${event.slug}`), siteUrl).href,
-  };
   return (
     <div className="container page-content">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll('<', '\\u003c') }}
-      />
+      <JsonLd data={eventEntities(language, event, cover?.signedUrl)} />
       <PageIntro label={event.category} title={event.title} />
       <div className="two-column">
         <div className="prose">

@@ -1,8 +1,7 @@
 import { getI18n } from '@/lib/i18n/server';
 import { languagePath, pick } from '@/lib/i18n/routing';
 import { JsonLd } from '@/components/json-ld';
-import { localizeMetadata } from '@/lib/seo';
-import type { Metadata } from 'next';
+import { itemListEntities, localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
 import {
   ArrowUpRight,
@@ -62,17 +61,12 @@ export default async function ResourcesPage({
   return (
     <div className="container page-content resources-page">
       <JsonLd
-        data={{
-          '@context': 'https://schema.org',
-          '@type': 'ItemList',
-          name: t('Recursos para aprender y construir'),
-          itemListElement: selected.map((resource, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            name: t(resource.title),
-            url: resource.url,
-          })),
-        }}
+        data={itemListEntities(
+          language,
+          '/recursos',
+          t('Recursos para aprender y construir'),
+          selected.map((resource) => ({ name: t(resource.title), url: resource.url })),
+        )}
       />
       <PageIntro
         label={t('La curiosidad necesita buenos enlaces')}

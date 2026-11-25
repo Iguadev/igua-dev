@@ -1,12 +1,22 @@
-# Multilingual search and AI discoverability
+# Multilingual search, SEO and AEO
 
 Argentine Spanish uses unprefixed URLs. The proxy sets the request language from the URL. An internal rewrite then maps Brazilian Portuguese (`/pt`) and English (`/en`) paths to the corresponding page. Member and admin authorization remains independent of language.
 
 Each localized page has its own canonical URL and links to its `es-AR`, `pt-BR` and `en` alternates. The `x-default` alternate points to Spanish. The sitemap lists all three versions of each public page it includes. Use localized Open Graph/Twitter metadata and social images, stable organization/site/page entity IDs, breadcrumb data and visible answers to common community questions. Do not invent organizational credentials, addresses, people, partnerships or activity.
 
-GEO means generative engine optimization here. The work improves factual accessibility and crawlability, not guaranteed inclusion in AI answers. Google states no special AI-specific schema or file is required: https://developers.google.com/search/docs/appearance/ai-features . Language references: https://developers.google.com/search/docs/specialty/international/localized-versions . A human-readable llms.txt is supplementary documentation, not an indexing or ranking mechanism.
+GEO/AEO here means making the public site easy for search and answer engines to cite accurately: visible Q&A, stable entity IDs, localized metadata, and a factual `/llms.txt`. It is not a ranking guarantee and not a special Google file format. Google states no extra AI-only schema is required: https://developers.google.com/search/docs/appearance/ai-features . Language versions: https://developers.google.com/search/docs/specialty/international/localized-versions .
 
-Local-only authorization remains in force. Public indexing, Search Console/Bing verification, sitemap submission and domain configuration require a real deployed origin. Never submit localhost URLs. Use NEXT_PUBLIC_SITE_URL for the verified canonical origin before deployment.
+Implementation lives in `src/lib/seo.ts` (canonical/hreflang, Open Graph, Organization/WebSite/WebPage/breadcrumb graph, FAQ, Event, CreativeWork, ItemList, SearchAction on the resource library). `/about` keeps FAQ copy in the page and in `faqEntities` with `@id` `…/about#faq` so it does not collide with the WebPage entity. Event structured data maps `cancelled` → EventCancelled, `completed` → EventCompleted, otherwise EventScheduled, and only marks attendance as offline when a venue exists. Filtered `/recursos` views and member/admin routes stay `noindex`.
+
+The canonical production origin is **https://www.iguazu.dev**. `/sitemap.xml`, `/robots.txt` and `/llms.txt` always emit that origin, never localhost. On Vercel, HTML canonicals fall back to the same origin when `NEXT_PUBLIC_SITE_URL` is unset. Preview deployments are `noindex`.
+
+After deploying this code, confirm:
+
+1. `https://www.iguazu.dev/robots.txt` lists `Sitemap: https://www.iguazu.dev/sitemap.xml` and does not mention localhost.
+2. `https://www.iguazu.dev/sitemap.xml` lists `https://www.iguazu.dev/` and the `/pt` and `/en` alternates.
+3. Search Console (and Bing Webmaster, if used): add `https://www.iguazu.dev`, verify ownership, then submit `https://www.iguazu.dev/sitemap.xml`.
+
+Optional verification tokens: `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and `NEXT_PUBLIC_BING_SITE_VERIFICATION`. They only add meta tags; they do not replace the sitemap.
 
 ## Translation maintenance
 
@@ -18,4 +28,4 @@ Run `npm test`, `npm run typecheck`, `npm run build` and, with the preview runni
 
 ## Production handoff
 
-Set `NEXT_PUBLIC_SITE_URL` to the real HTTPS origin and rebuild. Verify canonical URLs, alternate languages, social images, published records and sitemap on that deployment. Only then verify site ownership and submit the sitemap to search engines. Keep login, member/admin pages and filtered search views out of indexing. `/llms.txt` links to public pages in Spanish, Portuguese and English. Visible page text and accurate structured data remain the primary material. No hosted configuration or search-engine submission was performed locally.
+On https://www.iguazu.dev, verify canonical URLs, `hreflang`, social images, published records, `/robots.txt`, `/llms.txt` and `/sitemap.xml`. Then verify site ownership and submit `https://www.iguazu.dev/sitemap.xml`. Keep login, member/admin pages and filtered search views out of indexing. Visible page text and accurate structured data remain the primary material.
