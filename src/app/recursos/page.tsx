@@ -1,5 +1,5 @@
 import { getI18n } from '@/lib/i18n/server';
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, pick } from '@/lib/i18n/routing';
 import { JsonLd } from '@/components/json-ld';
 import { localizeMetadata } from '@/lib/seo';
 import type { Metadata } from 'next';
@@ -149,13 +149,11 @@ export default async function ResourcesPage({
             </h2>
             <p role="status">
               {selected.length}{' '}
-              {language === 'en'
-                ? selected.length === 1
-                  ? 'resource'
-                  : 'resources'
-                : selected.length === 1
-                  ? 'recurso'
-                  : 'recursos'}
+              {pick(language, {
+                es: selected.length === 1 ? 'recurso' : 'recursos',
+                pt: selected.length === 1 ? 'recurso' : 'recursos',
+                en: selected.length === 1 ? 'resource' : 'resources',
+              })}
             </p>
           </div>
           {selected.length ? (

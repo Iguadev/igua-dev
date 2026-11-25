@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { parse } from '@babel/parser';
 import english from '../src/lib/i18n/en.json';
 import ui from '../src/lib/i18n/en-ui.json';
+import portuguese from '../src/lib/i18n/pt.json';
+import portugueseUi from '../src/lib/i18n/pt-ui.json';
 import { languagePath, stripLanguage, translator } from '../src/lib/i18n/routing';
 import { localizeMetadata, languageAlternates, siteEntities } from '../src/lib/seo';
 import { findResources, resources, resourceCategories } from '../src/features/resources/catalog';
@@ -15,6 +17,16 @@ describe('language routing and discoverability', () => {
     expect(languagePath('en', '/en/about')).toBe('/en/about');
     expect(stripLanguage('/enough')).toBe('/enough');
     expect(languagePath('en', '/')).toBe('/en');
+    expect(languagePath('pt', '/en/about?x=1')).toBe('/pt/about?x=1');
+    expect(languagePath('pt', '/')).toBe('/pt');
+    expect(languagePath('es', '/pt/events')).toBe('/events');
+    expect(stripLanguage('/pt')).toBe('/');
+    expect(stripLanguage('/ptolomeo')).toBe('/ptolomeo');
+  });
+  it('keeps every dictionary in sync with the English source keys', () => {
+    expect(Object.keys(portuguese)).toEqual(Object.keys(english));
+    expect(Object.keys(portugueseUi)).toEqual(Object.keys(ui));
+    for (const value of Object.values(portuguese)) expect(value.trim()).not.toBe('');
   });
   it('does not localize external, asset or API destinations', () => {
     for (const path of [
@@ -40,7 +52,12 @@ describe('language routing and discoverability', () => {
     expect(m.alternates?.languages).toEqual(languageAlternates('/about'));
     expect(String(languageAlternates('/about').en)).toMatch(/\/en\/about$/);
     expect(String(languageAlternates('/about')['es-AR'])).toMatch(/\/about$/);
+    expect(String(languageAlternates('/about')['pt-BR'])).toMatch(/\/pt\/about$/);
     expect(m.openGraph?.locale).toBe('en_US');
+    const pt = localizeMetadata({ title: 'Nuestra historia', alternates: { canonical: '/about' } }, 'pt');
+    expect(pt.alternates?.canonical).toBe('/pt/about');
+    expect(pt.openGraph?.locale).toBe('pt_BR');
+    expect(pt.title).not.toBe('Nuestra historia');
   });
   it('describes the organization consistently without invented contact details or metrics', () => {
     const schema = siteEntities('/partners', 'en', 'Partners');

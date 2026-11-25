@@ -13,6 +13,8 @@ import {
 import { Button } from './ui/button';
 import type { Event, Program, Project } from '@/lib/data';
 import { eventDate } from '@/lib/utils';
+import { languageTags, pick } from '@/lib/i18n/routing';
+import { MarkerWord } from './marker-word';
 export function PageIntro({
   label,
   title,
@@ -75,26 +77,25 @@ export async function EmptyState({
   }[kind];
   const Icon = items.icon;
   return (
-    <div className={`empty-state ${compact ? 'compact' : ''}`}>
-      <div className="empty-art" aria-hidden="true">
-        <span />
-        <Icon size={38} strokeWidth={1} />
-        <span />
-      </div>
+    <div className={`empty-state ticket-${kind} ${compact ? 'compact' : ''}`}>
       <div className="empty-copy">
-        <span className="small-label">{items.label}</span>
         <h3>{items.title}</h3>
         <p>{items.body}</p>
-        <Button variant="secondary" asChild>
+        <Button asChild>
           <Link href={items.href}>
             {items.cta}
             <ArrowUpRight size={16} />
           </Link>
         </Button>
       </div>
-      <span className="empty-corner" aria-hidden="true">
-        +
-      </span>
+      <div className="ticket-stub">
+        <Icon size={30} strokeWidth={1.6} aria-hidden="true" />
+        <strong>{items.label}</strong>
+        <span>
+          <MapPin size={14} aria-hidden="true" />
+          Puerto Iguazú, AR
+        </span>
+      </div>
     </div>
   );
 }
@@ -109,7 +110,7 @@ export async function EventCards({ events }: { events: Event[] }) {
             <span>{event.category}</span>
           </div>
           <div className="event-card-body">
-            <span className="small-label">
+            <span className="event-status">
               {event.status === 'cancelled'
                 ? t('Cancelado')
                 : event.status === 'completed'
@@ -121,7 +122,7 @@ export async function EventCards({ events }: { events: Event[] }) {
             <h3>{event.title}</h3>
             <p>
               <CalendarDays size={15} />
-              {eventDate(event.starts_at, event.time_zone, language === 'en' ? 'en' : 'es-AR')}
+              {eventDate(event.starts_at, event.time_zone, languageTags[language])}
             </p>
             <p>
               <MapPin size={15} />
@@ -207,14 +208,16 @@ export async function ProjectCards({ projects }: { projects: Project[] }) {
 export async function ClosingCTA() {
   const { t, language } = await getI18n();
   return (
-    <section className="closing">
+    <section className="closing" data-nav-tone="green">
       <div className="container closing-inner">
         <div>
-          <span className="small-label">{t('Hay lugar para vos.')}</span>
           <h2>
             {t('Tu próximo proyecto.')}
             <br />
-            {t('Tu próxima comunidad.')}
+            <MarkerWord
+              text={t('Tu próxima comunidad.')}
+              word={pick(language, { es: 'comunidad', pt: 'comunidade', en: 'community' })}
+            />
           </h2>
           <p>{t('No necesitás saberlo todo. Con tener ganas de empezar, alcanza.')}</p>
         </div>

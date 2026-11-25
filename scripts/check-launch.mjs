@@ -17,7 +17,9 @@ for (const route of [
   '/sitemap.xml',
   '/opengraph-image',
   '/brand/symbol.svg',
+  '/brand/symbol-reverse.svg',
   '/brand/wordmark.svg',
+  '/brand/wordmark-reverse.svg',
 ]) {
   const response = await fetch(new URL(route, base));
   assert.equal(response.status, 200, route);
@@ -59,5 +61,5 @@ for (const route of [
 ])
   assert.equal((await fetch(new URL(route, base))).status, 401, route);
 console.log(
-  'PASS: 17 public responses, 13 protected redirects, 3 noindex missing-page views, 2 unauthorized APIs.',
+  'PASS: 19 public responses, 13 protected redirects, 3 noindex missing-page views, 2 unauthorized APIs.',
 );

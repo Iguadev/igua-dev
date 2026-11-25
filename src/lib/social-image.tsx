@@ -1,6 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { ImageResponse } from 'next/og';
-import type { Language } from '@/lib/i18n/routing';
+import { pick, type Language } from '@/lib/i18n/routing';
 export const size = { width: 1200, height: 630 };
+const logo = `data:image/svg+xml;base64,${readFileSync(
+  join(process.cwd(), 'public/brand/wordmark-reverse.svg'),
+).toString('base64')}`;
 export function socialImage(language: Language) {
   return new ImageResponse(
     <div
@@ -16,12 +21,7 @@ export function socialImage(language: Language) {
         fontFamily: 'sans-serif',
       }}
     >
-      <div style={{ display: 'flex', fontSize: 32, fontWeight: 700 }}>
-        IGUA
-        <span style={{ background: '#B5F36B', color: '#0B1016', padding: '0 7px', marginLeft: 4 }}>
-          .DEV
-        </span>
-      </div>
+      <img src={logo} width={223} height={60} alt="IGUA.DEV" />
       <div
         style={{
           display: 'flex',
@@ -32,18 +32,22 @@ export function socialImage(language: Language) {
           maxWidth: 960,
         }}
       >
-        {language === 'en'
-          ? 'The future is being built here, too.'
-          : 'El futuro también se construye desde acá.'}
+        {pick(language, {
+          es: 'El futuro también se construye desde acá.',
+          pt: 'O futuro também se constrói daqui.',
+          en: 'The future is being built here, too.',
+        })}
       </div>
       <div
         style={{ display: 'flex', justifyContent: 'space-between', color: '#A7B2BF', fontSize: 21 }}
       >
         <span>Puerto Iguazú, Misiones, Argentina</span>
-        <span style={{ color: '#B5F36B' }}>
-          {language === 'en'
-            ? 'Code, community, and opportunities.'
-            : 'Código, comunidad y oportunidades.'}
+        <span style={{ color: '#69D381' }}>
+          {pick(language, {
+            es: 'Código, comunidad y oportunidades.',
+            pt: 'Código, comunidade e oportunidades.',
+            en: 'Code, community, and opportunities.',
+          })}
         </span>
       </div>
     </div>,

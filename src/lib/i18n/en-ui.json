@@ -111,10 +111,6 @@
   "Publicación": "Publication",
   "Publicado": "Published",
   "Resumen posterior (opcional)": "Event recap (optional)",
-  "Reanudar animación de conexiones": "Resume connection animation",
-  "Pausar animación de conexiones": "Pause connection animation",
-  "Reanudar": "Resume",
-  "Pausar": "Pause",
   "Revisá los campos, el slug y las fechas. Usá fechas ISO con zona horaria, por ejemplo 2027-03-20T18:00:00-03:00.": "Check the fields, slug, and dates. Use ISO dates with a time zone, for example 2027-03-20T18:00:00-03:00.",
   "Evento inválido.": "Invalid event.",
   "Esperá unos minutos antes de volver a guardar.": "Wait a few minutes before saving again.",
@@ -183,5 +179,6 @@
   "Datos": "Data",
   "No pudimos cargar este espacio.": "We could not load this space.",
   "Revisá tu conexión e intentá de nuevo en un momento.": "Check your connection and try again in a moment.",
-  "Volver a intentar": "Try again"
+  "Volver a intentar": "Try again",
+  "Cambiar idioma": "Change language"
 }

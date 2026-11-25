@@ -10,7 +10,7 @@ Audit: empty workspace, no app, conventions or infrastructure. The supplied brie
 
 ## Design plan
 
-Palette follows brief: ink #0B1016; lime #B5F36B; paper #F4F7F8; panel #151D25; rule #34414B; muted #A7B2BF. Geist Sans carries editorial headline and UI; Geist Mono marks actual metadata.
+Palette follows brief: ink #0B1016; brand green #69D381; paper #F4F7F8; panel #151D25; rule #34414B; muted #A7B2BF. Geist Sans carries editorial headline and UI; Geist Mono marks actual metadata.
 
 Hero: asymmetrical two-column layout, left aligned large statement and compact CTAs; right a custom confluence/network illustration derived from river routes. No stock photos, invented activity, affiliation or metrics. Navigation and footer are quiet; the river drawing is the signature element. Program areas have distinct geometric marks and limited supplementary accents. Global ambition comes through the system map and copy, not fake global membership.
 

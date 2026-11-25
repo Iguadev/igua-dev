@@ -1,6 +1,6 @@
 import { JsonLd } from '@/components/json-ld';
 import { siteUrl } from '@/lib/env';
-import { languagePath } from '@/lib/i18n/routing';
+import { languagePath, pick } from '@/lib/i18n/routing';
 import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
@@ -19,9 +19,30 @@ export async function generateMetadata() {
 export default async function About() {
   const { t, language } = await getI18n();
   const page = await content('about');
-  const faqs =
-    language === 'en'
-      ? [
+  const faqs = pick(language, {
+    pt: [
+      {
+        question: 'O que é a IGUA.DEV?',
+        answer:
+          'A IGUA.DEV é uma comunidade independente e aberta de tecnologia com base em Puerto Iguazú, Misiones, Argentina. Ela conecta developers, estudantes, designers, founders e pessoas curiosas por tecnologia.',
+      },
+      {
+        question: 'Posso participar de fora de Iguazú?',
+        answer:
+          'Sim. Pessoas de outras cidades e países são bem-vindas. Cada evento publicado vai indicar se é presencial, online ou híbrido.',
+      },
+      {
+        question: 'A participação é gratuita?',
+        answer:
+          'Sim. A participação é gratuita e aberta a pessoas de todos os níveis de experiência. As inscrições abrem quando os serviços da comunidade estiverem conectados.',
+      },
+      {
+        question: 'O que posso aprender aqui?',
+        answer:
+          'Você pode explorar engenharia de software, open source, inteligência artificial, automação, blockchain e tecnologias emergentes, e empreendedorismo. A biblioteca de recursos reúne tutoriais e documentação de quem cria as ferramentas.',
+      },
+    ],
+    en: [
           {
             question: 'What is IGUA.DEV?',
             answer:
@@ -42,8 +63,8 @@ export default async function About() {
             answer:
               'Explore software engineering, open source, AI, automation, blockchain and emerging technology, and entrepreneurship. The resources library links to tutorials and documentation from the people who make the tools.',
           },
-        ]
-      : [
+        ],
+    es: [
           {
             question: '¿Qué es IGUA.DEV?',
             answer:
@@ -64,7 +85,8 @@ export default async function About() {
             answer:
               'Podés explorar software, open source, inteligencia artificial, automatización, blockchain y tecnologías emergentes, y emprendimientos. La biblioteca de recursos reúne tutoriales y documentación de quienes crean las herramientas.',
           },
-        ];
+        ],
+  });
   return (
     <>
       <div className="container page-content">
@@ -144,7 +166,11 @@ export default async function About() {
         </div>
         <section className="community-faq" aria-labelledby="faq-title">
           <h2 id="faq-title">
-            {language === 'en' ? 'A few things worth knowing.' : 'Algunas respuestas para empezar.'}
+            {pick(language, {
+              es: 'Algunas respuestas para empezar.',
+              pt: 'Algumas respostas para começar.',
+              en: 'A few things worth knowing.',
+            })}
           </h2>
           {faqs.map((faq) => (
             <details key={faq.question}>
@@ -153,7 +179,11 @@ export default async function About() {
             </details>
           ))}
           <Link className="text-link" href="/recursos">
-            {language === 'en' ? 'Explore the resources' : 'Explorar recursos'}
+            {pick(language, {
+              es: 'Explorar recursos',
+              pt: 'Explorar recursos',
+              en: 'Explore the resources',
+            })}
           </Link>
         </section>
         <JsonLd
