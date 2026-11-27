@@ -49,6 +49,25 @@ test('protects member and administrative routes without credentials', async ({ p
   const cron = await request.get('/api/jobs/email');
   expect(cron.status()).toBe(401);
 });
+test('filters and searches Stellar resources in English', async ({ page }) => {
+  await page.goto('/en/recursos');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await page.getByRole('link', { name: 'Blockchain 2', exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/recursos\?tema=blockchain$/);
+
+  const cards = page.locator('[data-resource-id]');
+  await expect(cards).toHaveCount(2);
+  await expect(cards.nth(0)).toHaveAttribute('href', 'https://developers.stellar.org/');
+  await expect(cards.nth(1)).toHaveAttribute('href', 'https://developers.stellar.org/docs');
+
+  await page.getByRole('searchbox', { name: 'Search resources' }).fill('smart contracts');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(cards).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Stellar Developer Docs' })).toBeVisible();
+  await page.getByRole('link', { name: 'Clear search and filters' }).click();
+  await expect(page).toHaveURL(/\/en\/recursos$/);
+  await expect(page.getByRole('link', { name: /^All \d+$/ })).toHaveAttribute('aria-current', 'page');
+});
 test('mobile navigation expands and closes when following a link', async ({ page, isMobile }) => {
   test.skip(!isMobile);
   await page.goto('/');

@@ -147,14 +147,33 @@ describe('language routing and discoverability', () => {
   });
   it('searches the visible English resource descriptions', () => {
     const t = translator('en', english);
-    expect(findResources('exposed secrets', 'all', t).map((r) => r.id)).toEqual([
+    expect(findResources('exposed secrets', 'all', t, 'en').map((r) => r.id)).toEqual([
       'github-sensitive-data',
     ]);
     for (const resource of resources) {
       expect(english).toHaveProperty(resource.title);
       expect(english).toHaveProperty(resource.description);
+      expect(english).toHaveProperty(resource.format);
+      expect(english).toHaveProperty(resource.language);
     }
     for (const category of resourceCategories) expect(english).toHaveProperty(category.label);
+  });
+  it('selects resource destinations for the English catalog', () => {
+    const t = translator('en', english);
+    expect(findResources('git english', 'git', t, 'en')).toMatchObject([
+      {
+        id: 'github-git',
+        url: 'https://docs.github.com/en/get-started/using-git',
+        language: 'Inglés',
+      },
+    ]);
+    expect(findResources('git', 'git')).toMatchObject([
+      {
+        id: 'github-git',
+        url: 'https://docs.github.com/es/get-started/using-git',
+        language: 'Español',
+      },
+    ]);
   });
   it('covers every explicit translation call and all client message keys', () => {
     const missing: string[] = [];

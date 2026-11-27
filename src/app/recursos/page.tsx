@@ -2,7 +2,6 @@ import { getI18n } from '@/lib/i18n/server';
 import { languagePath, pick } from '@/lib/i18n/routing';
 import { JsonLd } from '@/components/json-ld';
 import { itemListEntities, localizeMetadata } from '@/lib/seo';
-import Link from '@/components/localized-link';
 import {
   ArrowUpRight,
   BookOpen,
@@ -11,6 +10,7 @@ import {
   Blocks,
   CloudUpload,
   GitBranch,
+  Network,
   ShieldCheck,
 } from 'lucide-react';
 import { PageIntro } from '@/components/sections';
@@ -25,7 +25,7 @@ import {
 const pageMetadata = {
   title: 'Recursos para aprender y construir',
   description:
-    'Tutoriales, guías y documentación de Codex, Cursor, Claude Code, skills.sh, Vercel y GitHub. Una biblioteca de referencias para la comunidad IGUA.DEV.',
+    'Tutoriales, guías y documentación de Codex, Cursor, Claude Code, skills.sh, Vercel, GitHub y Stellar. Una biblioteca de referencias para la comunidad IGUA.DEV.',
   alternates: { canonical: '/recursos' },
 };
 export async function generateMetadata() {
@@ -37,6 +37,7 @@ const icons = {
   agents: Blocks,
   deploy: CloudUpload,
   git: GitBranch,
+  blockchain: Network,
   security: ShieldCheck,
 } satisfies Record<ResourceCategory, typeof Terminal>;
 function filterUrl(category: string, query: string) {
@@ -51,11 +52,10 @@ export default async function ResourcesPage({
 }: {
   searchParams: Promise<{ q?: string | string[]; tema?: string | string[] }>;
 }) {
-  const { t, language } = await getI18n();
-  const params = await searchParams;
+  const [{ t, language }, params] = await Promise.all([getI18n(), searchParams]);
   const query = typeof params.q === 'string' ? params.q.trim().slice(0, 100) : '';
   const category = resourceCategories.find((item) => item.id === params.tema)?.id ?? 'all';
-  const selected = findResources(query, category, t);
+  const selected = findResources(query, category, t, language);
   const filtered = !!query || category !== 'all';
 
   return (
@@ -87,9 +87,9 @@ export default async function ResourcesPage({
           </div>
           <nav aria-label={t('Temas de recursos')} className="resources-topics">
             {resourceCategories.map((item) => (
-              <Link
+              <a
                 key={item.id}
-                href={filterUrl(item.id, query)}
+                href={languagePath(language, filterUrl(item.id, query))}
                 aria-current={category === item.id ? 'page' : undefined}
               >
                 <span>{t(item.label)}</span>
@@ -98,7 +98,7 @@ export default async function ResourcesPage({
                     ? resources.length
                     : resources.filter((r) => r.category === item.id).length}
                 </span>
-              </Link>
+              </a>
             ))}
           </nav>
           <div className="resources-reading-note">
@@ -196,16 +196,14 @@ export default async function ResourcesPage({
                 )}
               </p>
               <Button asChild variant="secondary">
-                <Link href={languagePath(language, '/recursos')}>
-                  {t('Ver todos los recursos')}
-                </Link>
+                <a href={languagePath(language, '/recursos')}>{t('Ver todos los recursos')}</a>
               </Button>
             </div>
           )}
           {filtered && selected.length > 0 && (
-            <Link href={languagePath(language, '/recursos')} className="text-link resources-reset">
+            <a href={languagePath(language, '/recursos')} className="text-link resources-reset">
               {t('Limpiar búsqueda y filtros')}
-            </Link>
+            </a>
           )}
           <div className="resources-source-note">
             <p>

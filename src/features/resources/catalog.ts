@@ -1,3 +1,5 @@
+import type { Language } from '@/lib/i18n/routing';
+
 /** Curated external references. Add entries here; no provider credentials are required. */
 export const resourceCategories = [
   { id: 'all', label: 'Todos' },
@@ -5,6 +7,7 @@ export const resourceCategories = [
   { id: 'agents', label: 'Skills y agentes' },
   { id: 'deploy', label: 'Web y despliegue' },
   { id: 'git', label: 'Git y colaboración' },
+  { id: 'blockchain', label: 'Blockchain' },
   { id: 'security', label: 'Seguridad' },
 ] as const;
 export type ResourceCategory = Exclude<(typeof resourceCategories)[number]['id'], 'all'>;
@@ -14,8 +17,9 @@ export type Resource = {
   provider: string;
   description: string;
   url: string;
+  englishUrl?: string;
   category: ResourceCategory;
-  format: 'Tutoriales y talleres' | 'Documentación' | 'Guía práctica' | 'Directorio';
+  format: 'Tutoriales y talleres' | 'Documentación' | 'Guía práctica' | 'Directorio' | 'Portal';
   language: 'Español' | 'Inglés';
   tags: readonly string[];
 };
@@ -28,6 +32,7 @@ export const resources: readonly Resource[] = [
     description:
       'Tutoriales y talleres para dar tus primeros pasos con Codex y llevarlo a tareas reales de programación.',
     url: 'https://openai.com/es-ES/academy/codex/',
+    englishUrl: 'https://openai.com/academy/codex/',
     category: 'ai',
     format: 'Tutoriales y talleres',
     language: 'Español',
@@ -88,10 +93,35 @@ export const resources: readonly Resource[] = [
     description:
       'Entendé el control de versiones y aprendé a trabajar con repositorios, cambios remotos y ramas.',
     url: 'https://docs.github.com/es/get-started/using-git',
+    englishUrl: 'https://docs.github.com/en/get-started/using-git',
     category: 'git',
     format: 'Documentación',
     language: 'Español',
     tags: ['git', 'github', 'commits', 'ramas', 'repositorios', 'colaboración', 'principiantes'],
+  },
+  {
+    id: 'stellar-developers',
+    title: 'Portal para desarrolladores de Stellar',
+    provider: 'Stellar Development Foundation',
+    description:
+      'Explorá la red Stellar, las herramientas de desarrollo y los primeros pasos para construir sobre la red.',
+    url: 'https://developers.stellar.org/',
+    category: 'blockchain',
+    format: 'Portal',
+    language: 'Inglés',
+    tags: ['stellar', 'blockchain', 'sdk', 'cli', 'testnet'],
+  },
+  {
+    id: 'stellar-docs',
+    title: 'Documentación de Stellar',
+    provider: 'Stellar Development Foundation',
+    description:
+      'Tutoriales y guías para escribir contratos inteligentes, crear aplicaciones y trabajar con la red Stellar.',
+    url: 'https://developers.stellar.org/docs',
+    category: 'blockchain',
+    format: 'Documentación',
+    language: 'Inglés',
+    tags: ['stellar', 'blockchain', 'soroban', 'smart contracts', 'rpc', 'sdk'],
   },
   {
     id: 'github-sensitive-data',
@@ -100,6 +130,8 @@ export const resources: readonly Resource[] = [
     description:
       'Una guía para responder a una exposición de secretos y entender cómo limpiar el historial de un repositorio.',
     url: 'https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository',
+    englishUrl:
+      'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository',
     category: 'security',
     format: 'Guía práctica',
     language: 'Español',
@@ -126,9 +158,15 @@ export function findResources(
   query: string,
   category: string,
   translate: (text: string) => string = (text) => text,
+  language: Language = 'es',
 ) {
   const terms = normalize(query.trim()).split(/\s+/).filter(Boolean);
-  return resources.filter((resource) => {
+  const localizedResources = resources.map((resource): Resource =>
+    language === 'en' && resource.englishUrl
+      ? { ...resource, url: resource.englishUrl, language: 'Inglés' }
+      : resource,
+  );
+  return localizedResources.filter((resource) => {
     if (category !== 'all' && resource.category !== category) return false;
     const text = normalize(
       [
