@@ -1,6 +1,6 @@
 # Connect and deploy
 
-The user's current instruction is **local-only; connect services later**. No hosted Supabase or Vercel resource was created or modified.
+The dedicated IGUA.DEV Supabase project is `mhwdotaiyytaurbbptfv`. Its migration history matches the migrations in this repository. For local development, use the project's Data API URL and publishable key in `.env.local` and set `NEXT_PUBLIC_SITE_URL=http://localhost:3000`. Vercel setup is documented separately below.
 
 ## Supabase
 
@@ -8,8 +8,8 @@ The user's current instruction is **local-only; connect services later**. No hos
 2. Check installed CLI help, link the intended project and inspect existing tables/migrations before applying the supplied migration. Start with a fresh staging project. Apply migrations using the supported CLI/MCP migration workflow, then run Supabase database security/performance advisors.
 3. Keep `private` out of exposed Data API schemas. The migration explicitly grants required table/function access with RLS. Check a published event, owner profile, non-owner project, organizer and administrator using real sessions.
 4. Configure `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, server-only `SUPABASE_SECRET_KEY`, `RATE_LIMIT_SECRET` (32+ random characters), and `NEXT_PUBLIC_SITE_URL=https://www.iguazu.dev` in Production. Preview deployments can omit it (they use `VERCEL_URL`). Do not prefix server secrets with NEXT_PUBLIC_. Rebuild after changing public values.
-5. Enable GitHub/Google providers with their app credentials in Supabase. Register the Supabase callback URL with each provider. Allow only exact local/staging/production application callbacks in Supabase redirect configuration. Avoid broad production wildcard allowlists.
-6. Set custom SMTP in Supabase for production magic links. For PKCE email confirmation use a template link such as `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/dashboard`. OAuth returns to `/auth/callback`; both flows verify server-side.
+5. Allow only exact local/staging/production application callbacks in Supabase redirect configuration. Avoid broad production wildcard allowlists.
+6. Set custom SMTP in Supabase for production magic links. The PKCE callback at `/auth/callback` exchanges the confirmation code server-side. The `/auth/confirm` route also supports templates that send a `token_hash` with `type=email`.
 7. Bootstrap the first administrator in a trusted SQL console after authenticating that person and verifying their auth user UUID:
 
 ```sql
@@ -20,6 +20,12 @@ on conflict(member_id,role) do nothing;
 ```
 
 Self-assignment through onboarding is deliberately impossible. The admin UI forbids demoting your own admin account.
+
+## Pollar
+
+Set `NEXT_PUBLIC_POLLAR_PUBLISHABLE_KEY` to the app's publishable key. The local `POLLAR_PUSHABLE_KEY` name also works. Use a Pollar Testnet app and allow `http://localhost:3000` under Build → Domains for local verification. Enable the intended sign-in methods and choose the wallet provisioning and funding policy in Pollar's dashboard. The IGUA.DEV flow uses only the publishable key.
+
+`/login` and `/join` offer Pollar when the Supabase URL and keys, `RATE_LIMIT_SECRET`, and the Pollar publishable key are configured. After Pollar authentication, the visitor confirms their email through the Supabase magic link. If Pollar has no email for the account, the visitor supplies it at that step. Verify both a new account and a returning account through the dashboard. Supabase issues the IGUA.DEV session and applies the existing member and staff permissions.
 
 ## Resend / email processing
 
@@ -43,7 +49,7 @@ Set Sentry DSN and optional build token/org/project to enable instrumentation an
 ## Before opening registration
 
 - Publish verified organizer identity and a contact channel in privacy/community pages; review the privacy text for the actual operating entity and retention process.
-- Complete real GitHub, Google and magic-link sign-in, refresh, sign-out and invalid-link journeys on desktop/mobile.
+- Complete real Pollar sign-in and email confirmation, refresh, sign-out and invalid-link journeys on desktop/mobile.
 - Test new member onboarding, opt-in directory visibility, private preferences, avatar upload, project ownership/moderation and member/admin route boundaries through the real Data API.
 - Exercise a published event from creation through registration, waitlist, cancellation, promotion, email, attendee export and attendance.
 - Run Supabase advisors and confirm no public write grants or unexpected schema exposure.

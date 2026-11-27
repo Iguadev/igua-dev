@@ -1,4 +1,8 @@
 {
+  "Pollar puede crear o conectar una billetera. Después confirmás tu email para entrar a IGUA.DEV.": "Pollar can create or connect a wallet. Then confirm your email to access IGUA.DEV.",
+  "Ya ingresaste en Pollar. Confirmá este email para continuar en IGUA.DEV.": "You’re signed in to Pollar. Confirm this email to continue to IGUA.DEV.",
+  "Ya ingresaste en Pollar. Ingresá un email para confirmar tu acceso a IGUA.DEV.": "You’re signed in to Pollar. Enter an email address to confirm access to IGUA.DEV.",
+  "Cambiar de cuenta de Pollar": "Switch Pollar account",
   "Desde Iguazú, hacia el mundo": "From Iguazú to the world",
   "La misión y los valores de IGUA.DEV, una comunidad independiente de tecnología en Puerto Iguazú.": "The mission and values of IGUA.DEV, an independent technology community in Puerto Iguazú, Argentina.",
   "Nuestra historia": "Our story",
@@ -441,7 +445,6 @@
   "Tu lugar en la comunidad.": "Your place in the community.",
   "Ingresá o creá tu cuenta. Es gratis y no necesitás contraseña.": "Sign in or create your account. It is free, with no password required.",
   "Estamos preparando la apertura de la comunidad. El registro y el acceso todavía no están habilitados.": "We are preparing to open the community. Registration and sign-in are not available yet.",
-  "o con tu email": "or with your email",
   "Enviarme un enlace": "Send me a sign-in link",
   "Tu email es privado. Al continuar aceptás nuestro": "Your email is private. By continuing, you accept our",
   "código de convivencia": "code of conduct",

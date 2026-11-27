@@ -2,7 +2,6 @@ import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
 import { AuthPanel } from '@/components/auth-panel';
-import { supabaseConfig } from '@/lib/env';
 const pageMetadata = {
   title: 'Sumate a la comunidad',
   description:
@@ -43,7 +42,7 @@ export default async function Join() {
             </p>
           </div>
         </div>
-        <AuthPanel enabled={!!supabaseConfig()} />
+        <AuthPanel />
       </div>
     </div>
   );

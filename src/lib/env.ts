@@ -12,6 +12,12 @@ export function supabaseConfig() {
   }
   return result.data;
 }
+export function pollarPublishableKey() {
+  const key = (
+    process.env.NEXT_PUBLIC_POLLAR_PUBLISHABLE_KEY || process.env.POLLAR_PUSHABLE_KEY
+  )?.trim();
+  return key && /^pub_(testnet|mainnet)_[\w-]+$/.test(key) ? key : null;
+}
 export const productionSiteUrl = 'https://www.iguazu.dev';
 export const siteUrl = new URL(
   process.env.NEXT_PUBLIC_SITE_URL ||

@@ -43,6 +43,25 @@ describe.sequential('PostgreSQL permissions and transactional registration', () 
     );
     expect(r.rows).toEqual([]);
   });
+  it('limits the table grants inherited from the hosted defaults', async () => {
+    const { rows } = await sql.query(`select
+      has_table_privilege('anon', 'public.events', 'SELECT') as public_events,
+      has_table_privilege('anon', 'public.events', 'INSERT') as anonymous_event_insert,
+      has_table_privilege('anon', 'public.member_roles', 'SELECT') as anonymous_roles,
+      has_table_privilege('authenticated', 'public.events', 'UPDATE') as staff_event_update,
+      has_table_privilege('authenticated', 'public.events', 'TRUNCATE') as member_truncate,
+      has_table_privilege('authenticated', 'public.event_registrations', 'INSERT') as direct_registration`);
+    expect(rows).toEqual([
+      {
+        public_events: true,
+        anonymous_event_insert: false,
+        anonymous_roles: false,
+        staff_event_update: true,
+        member_truncate: false,
+        direct_registration: false,
+      },
+    ]);
+  });
   it('keeps profiles opt-in and preferences private', async () => {
     const r = await asUser<{ id: string }>(A, 'select id from profiles');
     expect(r.rows.map((x) => x.id)).toEqual([A]);

@@ -23,8 +23,12 @@ test('launch journey is honest and public routes are accessible', async ({ page 
     page.getByRole('heading', { name: 'El próximo encuentro empieza con vos.' }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Quiero ser parte', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Continuar con GitHub' })).toBeDisabled();
-  await expect(page.getByRole('button', { name: 'Enviarme un enlace' })).toBeDisabled();
+  const authPanel = page.locator('.auth-panel');
+  const continueButton = authPanel.getByRole('button', { name: 'Continue', exact: true });
+  const closedNotice = authPanel.getByText(/El registro y el acceso todavía no están habilitados/);
+  await expect(continueButton.or(closedNotice)).toBeVisible();
+  await expect(authPanel.getByRole('button').filter({ hasNotText: /^Continue$/ })).toHaveCount(0);
+  await expect(authPanel.locator('form')).toHaveCount(0);
 });
 test('protects member and administrative routes without credentials', async ({ page, request }) => {
   for (const route of [

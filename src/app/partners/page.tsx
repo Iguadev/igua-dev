@@ -3,7 +3,7 @@ import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
 import { ActionForm, Field, TextArea } from '@/components/action-form';
 import { partners } from '@/lib/data';
-import { supabaseConfig } from '@/lib/env';
+import { rateLimitConfigured } from '@/lib/rate-limit';
 import { submitInquiry } from '@/features/partners/actions';
 const pageMetadata = {
   title: 'Construyamos oportunidades juntos',
@@ -17,8 +17,7 @@ export async function generateMetadata() {
 export default async function Partners() {
   const { t, language } = await getI18n();
   const all = await partners();
-  const enabled =
-    !!supabaseConfig() && !!process.env.SUPABASE_SECRET_KEY && !!process.env.RATE_LIMIT_SECRET;
+  const enabled = rateLimitConfigured();
   return (
     <div className="container page-content">
       <PageIntro

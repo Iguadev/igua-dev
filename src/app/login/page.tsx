@@ -2,7 +2,6 @@ import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
 import { AuthPanel } from '@/components/auth-panel';
-import { supabaseConfig } from '@/lib/env';
 import { safeNext } from '@/lib/utils';
 const pageMetadata = { title: 'Ingresar', robots: { index: false, follow: false } };
 export async function generateMetadata() {
@@ -33,7 +32,7 @@ export default async function Login({
             </div>
           )}
         </div>
-        <AuthPanel enabled={!!supabaseConfig()} next={safeNext(query.next)} />
+        <AuthPanel next={safeNext(query.next)} />
       </div>
     </div>
   );
