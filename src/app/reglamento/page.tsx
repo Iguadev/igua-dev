@@ -170,16 +170,6 @@ export default async function Guidelines() {
               )}
             </p>
           </section>
-          <footer className="guidelines-source">
-            <p>
-              {t('Referencia para esta adaptación:')}{' '}
-              <a href="https://salta.dev/reglamento/" target="_blank" rel="noopener noreferrer">
-                {t('Reglamento de Salta.dev')}
-              </a>
-              .
-            </p>
-            <p>{t('Redacción propia para la realidad y los canales actuales de IGUA.DEV.')}</p>
-          </footer>
         </article>
       </div>
     </div>
