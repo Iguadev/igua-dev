@@ -18,8 +18,14 @@ export function pollarPublishableKey() {
   )?.trim();
   return key && /^pub_(testnet|mainnet)_[\w-]+$/.test(key) ? key : null;
 }
+export const pollarSessionUrl = 'https://sdk.api.pollar.xyz/v3/auth/session/resume';
 export const productionSiteUrl = 'https://www.iguazu.dev';
 export const siteUrl = new URL(
   process.env.NEXT_PUBLIC_SITE_URL ||
     (process.env.VERCEL ? productionSiteUrl : 'http://localhost:3000'),
 ).origin;
+export const sessionCookies = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: siteUrl.startsWith('https://'),
+} as const;

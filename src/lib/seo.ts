@@ -90,6 +90,7 @@ export const pageLabels: Record<string, string> = {
   '/programs': 'Programas',
   '/projects': 'Proyectos',
   '/community': 'Comunidad',
+  '/members': 'Directorio de miembros',
   '/reglamento': 'Reglamento',
   '/partners': 'Aliados',
   '/recursos': 'Recursos',

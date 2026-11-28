@@ -1,7 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { safeNext, csv } from '../src/lib/utils';
 import { profileSchema, projectSchema, eventSchema } from '../src/lib/validation';
+import { countryOptions, isCountryCode, savedCountryCode } from '../src/lib/countries';
 describe('unsafe input boundaries', () => {
+  it('restores saved country names and uses assigned country codes for new selections', () => {
+    expect(savedCountryCode('Costa Rica')).toBe('CR');
+    expect(savedCountryCode('Brasil')).toBe('BR');
+    expect(savedCountryCode('PY')).toBe('PY');
+    expect(savedCountryCode('Unknown place')).toBeNull();
+    expect(isCountryCode('ZZ')).toBe(false);
+    expect(countryOptions('es')).toContainEqual({ value: 'DE', label: 'Alemania' });
+  });
   it('keeps redirects on the same origin', () => {
     for (const path of [
       'https://attacker.test',
@@ -36,6 +45,7 @@ describe('unsafe input boundaries', () => {
       profileSchema.safeParse({
         display_name: 'Ada',
         city: 'Iguazú',
+        country: 'AR',
         experience: 'starting',
         bio: '',
         github_url: '',

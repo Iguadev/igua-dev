@@ -2,8 +2,9 @@ import { getI18n } from '@/lib/i18n/server';
 import { languagePath } from '@/lib/i18n/routing';
 import { pollarPublishableKey } from '@/lib/env';
 import { rateLimitConfigured } from '@/lib/rate-limit';
+import { memberDestination } from '@/features/auth/destination';
 import { PollarAuth } from './pollar-auth';
-export async function AuthPanel({ next = '/dashboard' }: { next?: string }) {
+export async function AuthPanel({ next }: { next?: string }) {
   const { t, language } = await getI18n();
   const pollarKey = rateLimitConfigured() ? pollarPublishableKey() : null;
   return (
@@ -11,7 +12,7 @@ export async function AuthPanel({ next = '/dashboard' }: { next?: string }) {
       <h2>{t('Tu lugar en la comunidad.')}</h2>
       <p>{t('Ingresá o creá tu cuenta. Es gratis y no necesitás contraseña.')}</p>
       {pollarKey ? (
-        <PollarAuth apiKey={pollarKey} next={languagePath(language, next)} />
+        <PollarAuth apiKey={pollarKey} next={memberDestination(language, next, true)} />
       ) : (
         <div className="notice">
           {t(
@@ -20,7 +21,7 @@ export async function AuthPanel({ next = '/dashboard' }: { next?: string }) {
         </div>
       )}
       <p style={{ fontSize: 11, marginTop: 22, marginBottom: 0 }}>
-        {t('Tu email es privado. Al continuar aceptás nuestro')}{' '}
+        {t('Al continuar aceptás nuestro')}{' '}
         <a
           className="text-link"
           style={{ fontSize: 11 }}

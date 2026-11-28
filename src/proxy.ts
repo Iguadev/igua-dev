@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { supabaseConfig } from '@/lib/env';
+import { sessionCookies, supabaseConfig } from '@/lib/env';
 import { languagePath, pathLanguage, stripLanguage } from '@/lib/i18n/routing';
 export async function proxy(request: NextRequest) {
   const language = pathLanguage(request.nextUrl.pathname);
@@ -23,6 +23,7 @@ export async function proxy(request: NextRequest) {
       : nextResponse();
   let response = nextResponse();
   const client = createServerClient(config.url, config.key, {
+    cookieOptions: sessionCookies,
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(items, headers) {

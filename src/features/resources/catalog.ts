@@ -1,6 +1,6 @@
 import type { Language } from '@/lib/i18n/routing';
 
-/** Curated external references. Add entries here; no provider credentials are required. */
+/** Public catalog for previews without the Supabase resource migration. */
 export const resourceCategories = [
   { id: 'all', label: 'Todos' },
   { id: 'ai', label: 'IA para programar' },
@@ -17,7 +17,7 @@ export type Resource = {
   provider: string;
   description: string;
   url: string;
-  englishUrl?: string;
+  englishUrl?: string | null;
   category: ResourceCategory;
   format: 'Tutoriales y talleres' | 'Documentación' | 'Guía práctica' | 'Directorio' | 'Portal';
   language: 'Español' | 'Inglés';
@@ -159,9 +159,10 @@ export function findResources(
   category: string,
   translate: (text: string) => string = (text) => text,
   language: Language = 'es',
+  entries: readonly Resource[] = resources,
 ) {
   const terms = normalize(query.trim()).split(/\s+/).filter(Boolean);
-  const localizedResources = resources.map((resource): Resource =>
+  const localizedResources = entries.map((resource): Resource =>
     language === 'en' && resource.englishUrl
       ? { ...resource, url: resource.englishUrl, language: 'Inglés' }
       : resource,

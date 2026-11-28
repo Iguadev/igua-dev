@@ -13,6 +13,7 @@ import { languageTags } from '@/lib/i18n/routing';
 import { LanguageProvider } from '@/components/i18n/provider';
 import { localizeMetadata, pageLabels, siteEntities } from '@/lib/seo';
 import { JsonLd } from '@/components/json-ld';
+import { signedInUser } from '@/features/auth/guards';
 const marker = Permanent_Marker({
   weight: '400',
   subsets: ['latin'],
@@ -56,8 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const viewport: Viewport = { themeColor: '#0B1016', colorScheme: 'dark' };
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { language, t } = await getI18n();
-  const h = await headers();
+  const [{ language, t }, h, user] = await Promise.all([getI18n(), headers(), signedInUser()]);
   const path = h.get('x-igua-path') || '/';
   return (
     <html
@@ -73,7 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {!/^\/(dashboard|admin|login|auth|api)(?:\/|$)/.test(path) && (
             <JsonLd data={siteEntities(path, language, t(pageLabels[path] || 'IGUA.DEV'))} />
           )}
-          <Header />
+          <Header signedIn={!!user} />
           <main id="main">{children}</main>
           <Footer />
           {process.env.VERCEL && <Analytics />}

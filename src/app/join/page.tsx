@@ -2,6 +2,9 @@ import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
 import { AuthPanel } from '@/components/auth-panel';
+import { identity } from '@/features/auth/guards';
+import { memberDestination } from '@/features/auth/destination';
+import { redirect } from 'next/navigation';
 const pageMetadata = {
   title: 'Sumate a la comunidad',
   description:
@@ -13,7 +16,8 @@ export async function generateMetadata() {
   return localizeMetadata(pageMetadata, language);
 }
 export default async function Join() {
-  const { t, language } = await getI18n();
+  const [{ t, language }, member] = await Promise.all([getI18n(), identity()]);
+  if (member) redirect(memberDestination(language, undefined, member.profile?.onboarded === true));
   return (
     <div className="container page-content">
       <div className="auth-layout">

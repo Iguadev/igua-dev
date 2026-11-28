@@ -34,4 +34,6 @@ Never describe PGlite's queued calls as proof of real concurrent transactions. T
 
 ## Editing
 
+The profile city selector uses city names adapted from the [GeoNames Gazetteer](https://www.geonames.org/export/) through [cities.json](https://github.com/lutangar/cities.json), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The catalog is filtered by country, deduplicated by name, and searched on the server.
+
 Use `npm run format` for Prettier. Preserve the generated Next.js agent guide block in AGENTS.md. Do not remove boundaries just to silence a type or RLS error. Add behavior-level tests when changing permissions, state transitions or seat allocation.

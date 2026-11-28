@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-for (const [path, language] of [['/', 'es-AR'], ['/pt', 'pt-BR'], ['/en', 'en']]) {
+for (const [path, language] of [
+  ['/', 'es-AR'],
+  ['/pt', 'pt-BR'],
+  ['/en', 'en'],
+]) {
   test(`serves the three-city map in ${language}`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
@@ -13,6 +17,31 @@ for (const [path, language] of [['/', 'es-AR'], ['/pt', 'pt-BR'], ['/en', 'en']]
   });
 }
 
+test('localized home pages fit a 320-pixel viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  for (const path of ['/', '/pt', '/en']) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth), {
+        message: path,
+      })
+      .toBe(0);
+  }
+});
+
+test('landscape navigation fits and returns keyboard focus on close', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/en');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const nav = page.getByRole('navigation', { name: 'Mobile navigation' });
+  await expect(nav.getByRole('link', { name: 'Resources' })).toBeInViewport();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused();
+});
+
 test('launch journey is honest and public routes are accessible', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -24,10 +53,15 @@ test('launch journey is honest and public routes are accessible', async ({ page 
   ).toBeVisible();
   await page.getByRole('link', { name: 'Quiero ser parte', exact: true }).click();
   const authPanel = page.locator('.auth-panel');
-  const continueButton = authPanel.getByRole('button', { name: 'Continue', exact: true });
+  const continueButton = authPanel.getByRole('button', {
+    name: 'Continuar con Pollar',
+    exact: true,
+  });
   const closedNotice = authPanel.getByText(/El registro y el acceso todavía no están habilitados/);
   await expect(continueButton.or(closedNotice)).toBeVisible();
-  await expect(authPanel.getByRole('button').filter({ hasNotText: /^Continue$/ })).toHaveCount(0);
+  await expect(
+    authPanel.getByRole('button').filter({ hasNotText: /^Continuar con Pollar$/ }),
+  ).toHaveCount(0);
   await expect(authPanel.locator('form')).toHaveCount(0);
 });
 test('protects member and administrative routes without credentials', async ({ page, request }) => {
@@ -66,7 +100,10 @@ test('filters and searches Stellar resources in English', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Stellar Developer Docs' })).toBeVisible();
   await page.getByRole('link', { name: 'Clear search and filters' }).click();
   await expect(page).toHaveURL(/\/en\/recursos$/);
-  await expect(page.getByRole('link', { name: /^All \d+$/ })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: /^All \d+$/ })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 });
 test('mobile navigation expands and closes when following a link', async ({ page, isMobile }) => {
   test.skip(!isMobile);
@@ -75,7 +112,10 @@ test('mobile navigation expands and closes when following a link', async ({ page
   const navigation = page.getByRole('navigation', { name: 'Navegación móvil' });
   await expect(openMenu).toHaveAttribute('aria-expanded', 'false');
   await openMenu.click();
-  await expect(page.getByRole('button', { name: 'Cerrar menú' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('button', { name: 'Cerrar menú' })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
   await expect(navigation).toBeVisible();
   await navigation.getByRole('link', { name: 'Programas', exact: true }).click();
   await expect(openMenu).toHaveAttribute('aria-expanded', 'false');

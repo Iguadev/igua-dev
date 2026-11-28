@@ -25,6 +25,7 @@ IGUA.DEV connects developers, students, designers, founders, and people curious 
 - [Projects](${absolute('/en/projects')}): Community-published work after moderation.
 - [Resources](${absolute('/en/recursos')}): Curated links to tutorials and official documentation.
 - [Community](${absolute('/en/community')}): Participation and code of conduct.
+- [Member directory](${absolute('/en/members')}): Profiles members have chosen to share.
 - [Community guidelines](${absolute('/en/reglamento')}): Conduct, privacy, reporting and moderation.
 - [Partnerships](${absolute('/en/partners')}): Confirmed collaborations and partnership inquiries.
 - [Join](${absolute('/en/join')}): Free membership, when registration is enabled.
@@ -38,6 +39,7 @@ IGUA.DEV connects developers, students, designers, founders, and people curious 
 - [Proyectos](${absolute('/projects')}): Trabajo publicado por la comunidad.
 - [Recursos](${absolute('/recursos')}): Tutoriales y documentación seleccionados.
 - [Comunidad](${absolute('/community')}): Participación y código de convivencia.
+- [Directorio de miembros](${absolute('/members')}): Perfiles que sus integrantes eligieron compartir.
 - [Reglamento](${absolute('/reglamento')}): Convivencia, privacidad, reportes y moderación.
 - [Alianzas](${absolute('/partners')}): Colaboraciones confirmadas.
 - [Sumate](${absolute('/join')}): Membresía gratuita, cuando el registro esté habilitado.
@@ -51,6 +53,7 @@ IGUA.DEV connects developers, students, designers, founders, and people curious 
 - [Projetos](${absolute('/pt/projects')}): Trabalho publicado pela comunidade.
 - [Recursos](${absolute('/pt/recursos')}): Tutoriais e documentação selecionados.
 - [Comunidade](${absolute('/pt/community')}): Participação e código de convivência.
+- [Diretório de membros](${absolute('/pt/members')}): Perfis que os membros optaram por compartilhar.
 - [Regulamento](${absolute('/pt/reglamento')}): Convivência, privacidade, denúncias e moderação.
 - [Parcerias](${absolute('/pt/partners')}): Colaborações confirmadas.
 - [Participar](${absolute('/pt/join')}): Participação gratuita, quando o registro estiver habilitado.

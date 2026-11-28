@@ -1,6 +1,27 @@
 import 'server-only';
 import { cache } from 'react';
 import { db } from '@/lib/supabase/server';
+import { resources, type Resource } from '@/features/resources/catalog';
+
+export const resourceCatalog = cache(async function resourceCatalog(): Promise<
+  readonly Resource[]
+> {
+  const client = await db();
+  if (!client) return resources;
+  const { data, error } = await client
+    .from('resources')
+    .select(
+      'id,title,provider,description,url,englishUrl:english_url,category,format,language,tags',
+    )
+    .order('sort_order')
+    .order('id')
+    .returns<Resource[]>();
+  // Preserve the public catalog until the migration reaches this environment.
+  if (error?.code === 'PGRST205' || error?.code === '42P01') return resources;
+  if (error) throw new Error('Could not load resources');
+  return data ?? [];
+});
+
 export type Event = {
   id: string;
   slug: string;

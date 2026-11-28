@@ -76,6 +76,22 @@ try {
   console.log(
     'PASS: 24 concurrent sessions, 5 seats, 19 waitlisted, idempotent retries and cancellation race preserve capacity.',
   );
+  const sharedKey = 'a'.repeat(64);
+  const additionalKey = 'b'.repeat(64);
+  const logins = await Promise.all(
+    clients.map(async (client, index) => {
+      await client.query('set role service_role');
+      const { rows } = await client.query(
+        'select account_id from public.resolve_pollar_account($1::text[], null)',
+        [index % 2 === 0 ? [sharedKey] : [sharedKey, additionalKey]],
+      );
+      return rows[0].account_id;
+    }),
+  );
+  assert.equal(new Set(logins).size, 1);
+  console.log(
+    'PASS: overlapping Pollar sign-ins resolve to one account in 24 concurrent sessions.',
+  );
 } finally {
   await Promise.all(clients.map((c) => c.end()));
   if (admin) await admin.end();

@@ -3,7 +3,6 @@ import { getI18n } from '@/lib/i18n/server';
 import Link from '@/components/localized-link';
 import { requireMember } from '@/features/auth/guards';
 import { PageIntro } from '@/components/sections';
-import { Button } from '@/components/ui/button';
 export default async function Dashboard() {
   const { t, language } = await getI18n();
   const member = await requireMember();
@@ -27,21 +26,6 @@ export default async function Dashboard() {
       >
         <p>{t('Este es tu espacio para encontrarte, aprender y construir.')}</p>
       </PageIntro>
-      {!member.profile?.onboarded && (
-        <div className="info-panel" style={{ marginBottom: 25 }}>
-          <h2>{t('Empecemos por conocernos.')}</h2>
-          <p>
-            {t(
-              'Completá tu perfil para inscribirte a eventos y compartir proyectos. Lleva unos minutos.',
-            )}
-          </p>
-          <Button asChild>
-            <Link href={languagePath(language, '/dashboard/profile')}>
-              {t('Completar mi perfil')}
-            </Link>
-          </Button>
-        </div>
-      )}
       <div className="metrics">
         <div className="metric">
           <strong>{registrations.count ?? 0}</strong>

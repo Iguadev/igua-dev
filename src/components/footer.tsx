@@ -19,6 +19,7 @@ export async function Footer() {
           </div>
           <nav aria-label={t('Enlaces del pie')}>
             <Link href="/about">{t('Nuestra historia')}</Link>
+            <Link href="/members">{t('Directorio de miembros')}</Link>
             <Link href="/recursos">{t('Recursos para aprender')}</Link>
             <Link href="/reglamento">{t('Reglamento')}</Link>
             <Link href="/partners">{t('Colaborá con la comunidad')}</Link>

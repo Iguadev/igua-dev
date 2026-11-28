@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isCountryCode } from '@/lib/countries';
 const optionalUrl = z
   .union([
     z.literal(''),
@@ -8,6 +9,7 @@ const optionalUrl = z
 export const profileSchema = z.object({
   display_name: z.string().trim().min(2).max(80),
   city: z.string().trim().min(2).max(100),
+  country: z.string().refine(isCountryCode),
   experience: z.enum(['starting', 'student', 'junior', 'mid', 'senior']),
   bio: z.string().trim().max(500),
   github_url: optionalUrl.refine(

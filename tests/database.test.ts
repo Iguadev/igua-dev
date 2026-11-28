@@ -1,6 +1,7 @@
 import { beforeAll, afterAll, describe, it, expect } from 'vitest';
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync, readdirSync } from 'node:fs';
+import { resources } from '../src/features/resources/catalog';
 const sql = new PGlite();
 const A = '11111111-1111-4111-8111-111111111111',
   B = '22222222-2222-4222-8222-222222222222',
@@ -11,6 +12,12 @@ async function asUser<T>(user: string, query: string, params: unknown[] = []) {
   return sql.transaction(async (tx) => {
     await tx.exec('set local role authenticated');
     await tx.query("select set_config('request.jwt.claim.sub',$1,true)", [user]);
+    return tx.query<T>(query, params);
+  });
+}
+async function asService<T>(query: string, params: unknown[] = []) {
+  return sql.transaction(async (tx) => {
+    await tx.exec('set local role service_role');
     return tx.query<T>(query, params);
   });
 }
@@ -61,6 +68,51 @@ describe.sequential('PostgreSQL permissions and transactional registration', () 
         direct_registration: false,
       },
     ]);
+  });
+  it('publishes the existing catalog in order and prevents client writes', async () => {
+    const { rows } = await sql.transaction(async (tx) => {
+      await tx.exec('set local role anon');
+      return tx.query(`
+        select id, title, provider, description, url, english_url as "englishUrl",
+               category, format, language, tags
+        from public.resources
+        order by sort_order, id
+      `);
+    });
+    expect(rows).toEqual(resources.map((entry) => ({ englishUrl: null, ...entry })));
+    const read = await asUser(A, 'select id from public.resources');
+    expect(read.rows).toHaveLength(resources.length);
+    await expect(asUser(A, 'delete from public.resources')).rejects.toThrow('permission denied');
+  });
+  it('preserves the legacy profile and shares it across linked Pollar methods', async () => {
+    const emailKey = '1'.repeat(64);
+    const googleKey = '2'.repeat(64);
+    const query = 'select * from public.resolve_pollar_account($1::text[], $2::text)';
+    const first = await asService<{ account_id: string; email: string }>(query, [
+      [emailKey],
+      'a@test.invalid',
+    ]);
+    expect(first.rows[0].email).toBe('a@test.invalid');
+    await asService('select public.bind_pollar_account($1::uuid, $2::uuid)', [
+      first.rows[0].account_id,
+      A,
+    ]);
+    await asService(query, [[googleKey, emailKey], 'a@test.invalid']);
+    const returning = await asService(query, [[googleKey], null]);
+    expect(returning.rows).toEqual([{ ...first.rows[0], user_id: A }]);
+    await expect(asUser(A, query, [[googleKey], null])).rejects.toThrow('permission denied');
+  });
+
+  it('keeps a wallet-only account stable and rejects a conflicting verified legacy email', async () => {
+    const walletKey = '3'.repeat(64);
+    const query = 'select * from public.resolve_pollar_account($1::text[], $2::text)';
+    const first = await asService<{ email: string }>(query, [[walletKey], null]);
+    expect(first.rows[0].email).toMatch(/@pollar\.invalid$/);
+    const returning = await asService(query, [[walletKey], null]);
+    expect(returning.rows).toEqual(first.rows);
+    await expect(asService(query, [[walletKey, '4'.repeat(64)], 'b@test.invalid'])).rejects.toThrow(
+      'POLLAR_ACCOUNT_CONFLICT',
+    );
   });
   it('keeps profiles opt-in and preferences private', async () => {
     const r = await asUser<{ id: string }>(A, 'select id from profiles');
@@ -196,13 +248,24 @@ describe.sequential('onboarding, public access and staff boundaries', () => {
       updates: true,
     };
     await asUser(A, 'select save_profile($1::jsonb,$2::uuid[])', [
-      JSON.stringify({ ...data, id: B, role: 'admin' }),
+      JSON.stringify({ ...data, country: ' Brasil ', id: B, role: 'admin' }),
       [],
     ]);
     expect((await asUser(A, 'select display_name from profiles where id=$1', [A])).rows).toEqual([
       { display_name: 'Updated A' },
     ]);
     expect((await asUser(B, 'select id from profiles where id=$1', [A])).rows).toHaveLength(0);
+    const readCountry = 'select country from member_preferences where member_id=$1';
+    expect((await asUser(A, readCountry, [A])).rows).toEqual([{ country: 'Brasil' }]);
+    expect((await asUser(B, readCountry, [A])).rows).toHaveLength(0);
+    await asUser(A, 'select save_profile($1::jsonb,$2::uuid[])', [JSON.stringify(data), []]);
+    expect((await asUser(A, readCountry, [A])).rows).toEqual([{ country: 'Brasil' }]);
+    await expect(
+      asUser(A, 'select save_profile($1::jsonb,$2::uuid[])', [
+        JSON.stringify({ ...data, country: ' ' }),
+        [],
+      ]),
+    ).rejects.toThrow('INVALID_COUNTRY');
     expect(
       (await asUser(A, "select role from member_roles where member_id=$1 and role='admin'", [A]))
         .rows,

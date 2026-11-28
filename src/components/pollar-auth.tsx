@@ -23,13 +23,9 @@ export function PollarAuth({ apiKey, next }: { apiKey: string; next: string }) {
 
   return (
     <div className="form">
-      <p>
-        {t(
-          'Pollar puede crear o conectar una billetera. Después confirmás tu email para entrar a IGUA.DEV.',
-        )}
-      </p>
-      <Button className="auth-continue" lang="en" type="button" onClick={() => setStarted(true)}>
-        Continue
+      <p>{t('Ingresá con Google, GitHub, tu billetera Stellar o tu email.')}</p>
+      <Button className="auth-continue" type="button" onClick={() => setStarted(true)}>
+        {t('Continuar con Pollar')}
       </Button>
     </div>
   );

@@ -2,7 +2,9 @@ import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import { PageIntro } from '@/components/sections';
 import { AuthPanel } from '@/components/auth-panel';
-import { safeNext } from '@/lib/utils';
+import { identity } from '@/features/auth/guards';
+import { memberDestination } from '@/features/auth/destination';
+import { redirect } from 'next/navigation';
 const pageMetadata = { title: 'Ingresar', robots: { index: false, follow: false } };
 export async function generateMetadata() {
   const { language } = await getI18n();
@@ -11,10 +13,10 @@ export async function generateMetadata() {
 export default async function Login({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string }>;
 }) {
-  const { t, language } = await getI18n();
-  const query = await searchParams;
+  const [{ t, language }, query, member] = await Promise.all([getI18n(), searchParams, identity()]);
+  if (member) redirect(memberDestination(language, query.next, member.profile?.onboarded === true));
   return (
     <div className="container page-content">
       <div className="auth-layout">
@@ -26,13 +28,8 @@ export default async function Login({
               )}
             </p>
           </PageIntro>
-          {query.error && (
-            <div className="form-message error" role="alert">
-              {t('El enlace no es válido o ya venció. Pedí uno nuevo para ingresar.')}
-            </div>
-          )}
         </div>
-        <AuthPanel next={safeNext(query.next)} />
+        <AuthPanel next={query.next} />
       </div>
     </div>
   );

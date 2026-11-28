@@ -58,6 +58,7 @@ export function Field({
   placeholder = '',
   maxLength,
   minLength,
+  autoComplete,
 }: {
   label: string;
   name: string;
@@ -67,6 +68,7 @@ export function Field({
   placeholder?: string;
   maxLength?: number;
   minLength?: number;
+  autoComplete?: string;
 }) {
   return (
     <div>
@@ -79,6 +81,7 @@ export function Field({
         required={required}
         placeholder={placeholder}
         maxLength={maxLength}
+        autoComplete={autoComplete}
         minLength={minLength}
       />
     </div>

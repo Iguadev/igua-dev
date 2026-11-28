@@ -9,6 +9,7 @@ const routes = [
   '/projects',
   '/programs',
   '/community',
+  '/members',
   '/reglamento',
   '/recursos',
   '/join',
@@ -59,5 +60,5 @@ for (const language of ['es', 'en']) {
   assert.ok(r.headers.get('content-type')?.includes('image/png'));
 }
 console.log(
-  'PASS: 12 English pages, language headers, canonicals, hreflang, protected redirects, bilingual sitemap, llms.txt, robots and both social images.',
+  'PASS: 13 English pages, language headers, canonicals, hreflang, protected redirects, bilingual sitemap, llms.txt, robots and both social images.',
 );

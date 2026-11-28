@@ -19,9 +19,10 @@ const links = [
   ['/recursos', 'Recursos'],
 ];
 const mobileLinks = [...links, ['/partners', 'Aliados']];
-export function Header() {
+export function Header({ signedIn }: { signedIn: boolean }) {
   const { t } = useI18n();
   const pathname = stripLanguage(usePathname());
+  const memberArea = /^\/(dashboard|admin)(\/|$)/.test(pathname);
   const [open, setOpen] = useState(false);
   const isHome = pathname === '/';
   const [intro] = useState(isHome);
@@ -108,12 +109,19 @@ export function Header() {
         </nav>
         <div className="header-actions">
           <LanguageSwitch />
-          <Button asChild size="sm" className="header-join">
-            <Link href="/join">
-              {t('Sumate')}
-              <ArrowUpRight size={15} />
-            </Link>
-          </Button>
+          {!signedIn && (
+            <Button asChild size="sm" className="header-join">
+              <Link href="/join">
+                {t('Sumate')}
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            </Button>
+          )}
+          {signedIn && !memberArea && (
+            <Button asChild size="sm" variant="outline">
+              <Link href="/dashboard">{t('Mi espacio')}</Link>
+            </Button>
+          )}
         </div>
         <button
           ref={toggleRef}
@@ -156,10 +164,10 @@ export function Header() {
             className="mobile-menu-actions"
             style={{ '--i': mobileLinks.length } as React.CSSProperties}
           >
-            <Button asChild>
-              <Link href="/join" onClick={() => setOpen(false)}>
-                {t('Unirme a IGUA.DEV')}
-                <ArrowUpRight size={18} />
+            <Button asChild variant={signedIn ? 'outline' : 'default'}>
+              <Link href={signedIn ? '/dashboard' : '/join'} onClick={() => setOpen(false)}>
+                {signedIn ? t('Mi espacio') : t('Unirme a IGUA.DEV')}
+                {!signedIn && <ArrowUpRight size={18} aria-hidden="true" />}
               </Link>
             </Button>
           </div>

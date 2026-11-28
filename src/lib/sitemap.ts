@@ -9,6 +9,7 @@ export const publicSitemapPaths = [
   '/programs',
   '/projects',
   '/community',
+  '/members',
   '/reglamento',
   '/recursos',
   '/partners',

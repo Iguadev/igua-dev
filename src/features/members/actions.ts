@@ -1,8 +1,14 @@
 'use server';
 import { revalidatePath } from 'next/cache';
+import { redirect, RedirectType } from 'next/navigation';
 import { requireMember } from '@/features/auth/guards';
+import { memberDestination } from '@/features/auth/destination';
+import { getI18n } from '@/lib/i18n/server';
 import { profileSchema } from '@/lib/validation';
+import { cityName } from '@/lib/cities';
+import { savedCountryCode } from '@/lib/countries';
 import { rateLimit } from '@/lib/rate-limit';
+import { isAvatarFile } from '@/features/members/avatar';
 import type { FormState } from '@/components/action-form';
 export async function saveProfile(_state: FormState, form: FormData): Promise<FormState> {
   const member = await requireMember();
@@ -15,18 +21,39 @@ export async function saveProfile(_state: FormState, form: FormData): Promise<Fo
   if (!parsed.success)
     return {
       message:
-        'Revisá los campos. Completá nombre y ciudad; usá enlaces válidos y una bio de hasta 500 caracteres.',
+        'Completá tu nombre, ciudad y país. Usá enlaces válidos y una bio de hasta 500 caracteres.',
     };
   if (!(await rateLimit('profile', member.user.id)))
     return { message: 'Esperá unos minutos antes de volver a guardar.' };
   const { interests, ...profile } = parsed.data;
+  const canonicalCity = await cityName(profile.country, profile.city);
+  if (canonicalCity) {
+    profile.city = canonicalCity;
+  } else {
+    // Earlier profiles allowed a free-text city. Keep it only with its original country.
+    const { data } =
+      member.profile?.city === profile.city
+        ? await member.client
+            .from('member_preferences')
+            .select('country')
+            .eq('member_id', member.user.id)
+            .maybeSingle()
+        : { data: null };
+    if (savedCountryCode(data?.country) !== profile.country)
+      return { message: 'Elegí una ciudad del país seleccionado.' };
+  }
   const { error } = await member.client.rpc('save_profile', {
     p_data: profile,
     p_interests: interests,
   });
   if (error) return { message: 'No pudimos guardar tu perfil. Intentá de nuevo.' };
   revalidatePath('/dashboard');
-  revalidatePath('/community');
+  revalidatePath('/members');
+  if (!member.profile?.onboarded)
+    redirect(
+      memberDestination((await getI18n()).language, form.get('next'), true),
+      RedirectType.replace,
+    );
   return {
     ok: true,
     message:
@@ -40,7 +67,7 @@ export async function requestDeletion(_state: FormState, form: FormData): Promis
   const { error } = await member.client.rpc('request_deletion');
   if (error) return { message: 'No pudimos registrar tu solicitud. Intentá de nuevo.' };
   revalidatePath('/dashboard/settings');
-  revalidatePath('/community');
+  revalidatePath('/members');
   return {
     ok: true,
     message:
@@ -50,13 +77,7 @@ export async function requestDeletion(_state: FormState, form: FormData): Promis
 export async function uploadAvatar(_state: FormState, form: FormData): Promise<FormState> {
   const member = await requireMember();
   const file = form.get('avatar');
-  if (
-    !(file instanceof File) ||
-    file.size === 0 ||
-    file.size > 2097152 ||
-    !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
-  )
-    return { message: 'Elegí una imagen PNG, JPG o WebP de hasta 2 MB.' };
+  if (!isAvatarFile(file)) return { message: 'Elegí una imagen PNG, JPG o WebP de hasta 2 MB.' };
   if (!(await rateLimit('avatar', member.user.id)))
     return { message: 'Intentá de nuevo más tarde.' };
   const bytes = new Uint8Array(await file.arrayBuffer());

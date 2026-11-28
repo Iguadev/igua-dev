@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { PageIntro } from '@/components/sections';
 import { Button } from '@/components/ui/button';
+import { resourceCatalog } from '@/lib/data';
 import {
   findResources,
   resourceCategories,
-  resources,
   type ResourceCategory,
 } from '@/features/resources/catalog';
 
@@ -52,10 +52,14 @@ export default async function ResourcesPage({
 }: {
   searchParams: Promise<{ q?: string | string[]; tema?: string | string[] }>;
 }) {
-  const [{ t, language }, params] = await Promise.all([getI18n(), searchParams]);
+  const [{ t, language }, params, resources] = await Promise.all([
+    getI18n(),
+    searchParams,
+    resourceCatalog(),
+  ]);
   const query = typeof params.q === 'string' ? params.q.trim().slice(0, 100) : '';
   const category = resourceCategories.find((item) => item.id === params.tema)?.id ?? 'all';
-  const selected = findResources(query, category, t, language);
+  const selected = findResources(query, category, t, language, resources);
   const filtered = !!query || category !== 'all';
 
   return (

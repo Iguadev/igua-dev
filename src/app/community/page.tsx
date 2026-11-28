@@ -3,7 +3,6 @@ import { getI18n } from '@/lib/i18n/server';
 import { localizeMetadata } from '@/lib/seo';
 import Link from '@/components/localized-link';
 import { PageIntro, ClosingCTA } from '@/components/sections';
-import { db } from '@/lib/supabase/server';
 const pageMetadata = {
   title: 'Una comunidad abierta',
   description: 'Conocé cómo participar en IGUA.DEV y nuestro código de convivencia.',
@@ -15,16 +14,6 @@ export async function generateMetadata() {
 }
 export default async function Community() {
   const { t, language } = await getI18n();
-  const client = await db();
-  const { data: members, error } = client
-    ? await client
-        .from('profiles')
-        .select('id,display_name,city,bio,github_url')
-        .eq('public_profile', true)
-        .eq('onboarded', true)
-        .limit(24)
-    : { data: [], error: null };
-  if (error) throw new Error('Could not load community');
   return (
     <>
       <div className="container page-content">
@@ -50,28 +39,8 @@ export default async function Community() {
                 t('y contanos qué te interesa. No hace falta tener un portfolio ni un título.')}
             </p>
             <h2>{t('Personas de la comunidad.')}</h2>
-            {members?.length ? (
-              <div className="stack">
-                {members.map((m) => (
-                  <article key={m.id} className="info-panel">
-                    <h3>{m.display_name}</h3>
-                    <p>{m.city}</p>
-                    <p>{m.bio}</p>
-                    {m.github_url && (
-                      <a href={m.github_url} target="_blank" rel="noopener noreferrer">
-                        {t('Perfil de GitHub')}
-                      </a>
-                    )}
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p>
-                {t(
-                  'Los perfiles públicos aparecerán acá cuando sus integrantes elijan compartirlos. La privacidad es el punto de partida.',
-                )}
-              </p>
-            )}
+            <p>{t('Conocé a quienes comparten su perfil y sus proyectos en IGUA.DEV.')}</p>
+            <Link href="/members">{t('Ver el directorio')}</Link>
           </div>
           <aside className="info-panel">
             <h2>{t('Desde Iguazú, con apertura.')}</h2>

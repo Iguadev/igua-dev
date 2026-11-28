@@ -4,14 +4,18 @@ import { redirect, notFound } from 'next/navigation';
 import { db } from '@/lib/supabase/server';
 import { getI18n } from '@/lib/i18n/server';
 import { languagePath } from '@/lib/i18n/routing';
-export const identity = cache(async () => {
+export const signedInUser = cache(async () => {
   const client = await db();
   if (!client) return null;
   const {
     data: { user },
     error,
   } = await client.auth.getUser();
-  if (error || !user) return null;
+  return error ? null : user;
+});
+export const identity = cache(async () => {
+  const [client, user] = await Promise.all([db(), signedInUser()]);
+  if (!client || !user) return null;
   const [{ data: profile }, { data: roles }] = await Promise.all([
     client.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     client.from('member_roles').select('role').eq('member_id', user.id),
